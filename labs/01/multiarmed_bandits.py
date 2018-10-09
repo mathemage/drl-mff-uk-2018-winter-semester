@@ -97,3 +97,5 @@ if __name__ == "__main__":
 
 	# Print out final score as mean and variance of all obtained rewards.
 	print("Final score: {}, variance: {}".format(np.mean(average_rewards), np.var(average_rewards)))
+	with open("results.txt", "a") as output_file:
+		print("{}".format(np.mean(average_rewards)), file=output_file)
