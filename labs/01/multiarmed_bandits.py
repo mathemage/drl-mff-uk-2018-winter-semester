@@ -55,11 +55,14 @@ if __name__ == "__main__":
 		while not done:
 			# TODO: Action selection according to mode
 			if args.mode == "greedy":
-				action =
+				action = None
+				raise NotImplementedError
 			elif args.mode == "ucb":
-				action =
+				action = None
+				raise NotImplementedError
 			elif args.mode == "gradient":
-				action =
+				action = None
+				raise NotImplementedError
 
 			_, reward, done, _ = env.step(action)
 			average_rewards[-1] += reward / args.episode_length
