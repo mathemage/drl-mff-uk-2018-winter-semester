@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 
+
 class MultiArmedBandits():
 	def __init__(self, bandits, episode_length):
 		self._bandits = []
@@ -24,12 +25,19 @@ class MultiArmedBandits():
 		return None, reward, self._done, {}
 
 
+def softmax(v):
+	"""Compute softmax values for each sets of scores in v."""
+	e_v = np.exp(v - np.max(v))
+	return e_v / e_v.sum()
+
+
 if __name__ == "__main__":
 	# Fix random seed
 	np.random.seed(42)
 
 	# Parse arguments
 	import argparse
+
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--bandits", default=10, type=int, help="Number of bandits.")
 	parser.add_argument("--episodes", default=1000, type=int, help="Training episodes.")
@@ -48,17 +56,17 @@ if __name__ == "__main__":
 	for episode in range(args.episodes):
 		env.reset()
 
-		# TODO: Initialize required values (depending on mode).
+		# Done: Initialize required values (depending on mode).
 		if args.mode == "gradient":
 			h = np.zeros(args.bandits)
-		else:   # greedy or UCB
+		else:  # greedy or UCB
 			q = args.initial * np.ones(args.bandits)
 			n = np.zeros(args.bandits)
 
 		average_rewards.append(0)
 		done = False
 		while not done:
-			# TODO: Action selection according to mode
+			# Done: Action selection according to mode
 			if args.mode == "greedy":
 				if np.random.uniform() > args.epsilon:
 					action = np.argmax(q)
@@ -71,16 +79,18 @@ if __name__ == "__main__":
 					ucb_sum = args.c * np.sqrt(np.log(episode) / n)
 					action = np.argmax(q + ucb_sum)
 			elif args.mode == "gradient":
-				action = None
-				raise NotImplementedError
+				pi = softmax(h)
+				action = np.random.choice(args.bandits, p=pi)
 
 			_, reward, done, _ = env.step(action)
 			average_rewards[-1] += reward / args.episode_length
 
-			# TODO: Update parameters
+			# Done: Update parameters
 			if args.mode == "gradient":
-				raise NotImplementedError
-			else:   # greedy or UCB
+				one_hot = np.zeros(args.bandits)
+				one_hot[action] = 1
+				h += args.alpha * reward * (one_hot - pi)
+			else:  # greedy or UCB
 				n[action] += 1
 				step_size = 1 / n[action] if args.alpha == 0 else args.alpha
 				q[action] += step_size * (reward - q[action])

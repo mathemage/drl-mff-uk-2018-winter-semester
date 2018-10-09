@@ -30,7 +30,7 @@ ${PYTHON} ${SCRIPT} --mode ucb --c 0.03125   # 1/32
 ${PYTHON} ${SCRIPT} --mode ucb --c 0.0625    # 1/16
 ${PYTHON} ${SCRIPT} --mode ucb --c 0.125     # 1/8
 
-# 5) gradient
+## 5) gradient
 ${PYTHON} ${SCRIPT} --mode gradient --alpha 0.0625    # 1/16
 ${PYTHON} ${SCRIPT} --mode gradient --alpha 0.125     # 1/8
 ${PYTHON} ${SCRIPT} --mode gradient --alpha 0.25      # 1/4
