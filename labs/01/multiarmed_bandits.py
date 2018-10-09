@@ -49,14 +49,19 @@ if __name__ == "__main__":
 		env.reset()
 
 		# TODO: Initialize required values (depending on mode).
+		# greedy:
+		q = np.zeros(args.bandits)
+		n = np.zeros(args.bandits)
 
 		average_rewards.append(0)
 		done = False
 		while not done:
 			# TODO: Action selection according to mode
 			if args.mode == "greedy":
-				action = None
-				raise NotImplementedError
+				if np.random.uniform() > args.epsilon:
+					action = np.argmax(q)
+				else:
+					action = np.random.randint(args.bandits)
 			elif args.mode == "ucb":
 				action = None
 				raise NotImplementedError
@@ -68,6 +73,10 @@ if __name__ == "__main__":
 			average_rewards[-1] += reward / args.episode_length
 
 			# TODO: Update parameters
+			# greedy:
+			n[action] += 1
+			q[action] += 1 / n[action] * (reward - q[action])
+
 
 	# Print out final score as mean and variance of all obtained rewards.
 	print("Final score: {}, variance: {}".format(np.mean(average_rewards), np.var(average_rewards)))
