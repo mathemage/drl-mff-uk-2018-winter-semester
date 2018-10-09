@@ -65,8 +65,11 @@ if __name__ == "__main__":
 				else:
 					action = np.random.randint(args.bandits)
 			elif args.mode == "ucb":
-				action = None
-				raise NotImplementedError
+				if 0 in n:
+					action = np.argmin(n)
+				else:
+					ucb_sum = args.c * np.sqrt(np.log(episode) / n)
+					action = np.argmax(q + ucb_sum)
 			elif args.mode == "gradient":
 				action = None
 				raise NotImplementedError
@@ -78,7 +81,6 @@ if __name__ == "__main__":
 			if args.mode == "gradient":
 				raise NotImplementedError
 			else:   # greedy or UCB
-				# greedy:
 				n[action] += 1
 				step_size = 1 / n[action] if args.alpha == 0 else args.alpha
 				q[action] += step_size * (reward - q[action])
