@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
 		# TODO: Initialize required values (depending on mode).
 		# greedy:
-		q = np.zeros(args.bandits)
+		q = args.initial * np.ones(args.bandits)
 		n = np.zeros(args.bandits)
 
 		average_rewards.append(0)
