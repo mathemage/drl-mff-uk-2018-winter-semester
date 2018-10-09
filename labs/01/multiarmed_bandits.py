@@ -49,9 +49,11 @@ if __name__ == "__main__":
 		env.reset()
 
 		# TODO: Initialize required values (depending on mode).
-		# greedy:
-		q = args.initial * np.ones(args.bandits)
-		n = np.zeros(args.bandits)
+		if args.mode == "gradient":
+			h = np.zeros(args.bandits)
+		else:   # greedy or UCB
+			q = args.initial * np.ones(args.bandits)
+			n = np.zeros(args.bandits)
 
 		average_rewards.append(0)
 		done = False
@@ -73,11 +75,13 @@ if __name__ == "__main__":
 			average_rewards[-1] += reward / args.episode_length
 
 			# TODO: Update parameters
-			# greedy:
-			n[action] += 1
-			step_size = 1 / n[action] if args.alpha == 0 else args.alpha
-			q[action] += step_size * (reward - q[action])
-
+			if args.mode == "gradient":
+				raise NotImplementedError
+			else:   # greedy or UCB
+				# greedy:
+				n[action] += 1
+				step_size = 1 / n[action] if args.alpha == 0 else args.alpha
+				q[action] += step_size * (reward - q[action])
 
 	# Print out final score as mean and variance of all obtained rewards.
 	print("Final score: {}, variance: {}".format(np.mean(average_rewards), np.var(average_rewards)))
