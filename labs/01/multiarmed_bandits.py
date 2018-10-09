@@ -75,7 +75,10 @@ if __name__ == "__main__":
 			# TODO: Update parameters
 			# greedy:
 			n[action] += 1
-			q[action] += 1 / n[action] * (reward - q[action])
+			if args.alpha != 0:
+				q[action] += 1 / n[action] * (reward - q[action])
+			else:
+				q[action] += args.alpha * (reward - q[action])
 
 
 	# Print out final score as mean and variance of all obtained rewards.
