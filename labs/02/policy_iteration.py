@@ -34,6 +34,17 @@ class GridWorld:
 		if state >= 5: state -= 1
 		return [probability, +1 if state == 3 else -100 if state == 6 else 0, state]
 
+
+def print_value_and_policy():
+	for l in range(3):
+		for c in range(4):
+			state = l * 4 + c
+			if state >= 5: state -= 1
+			print("        " if l == 1 and c == 1 else "{:-8.2f}".format(value_function[state]), end="")
+			print(" " if l == 1 and c == 1 else GridWorld.actions[policy[state]], end="")
+		print()
+
+
 if __name__ == "__main__":
 	# Parse arguments
 	import argparse
@@ -53,10 +64,8 @@ if __name__ == "__main__":
 	# Bellman equation. Perform the policy evaluation synchronously (i.e., do
 	# not overwrite the current value function when computing its improvement).
 	for step in range(args.steps):
-		print("Policy improvement step #{}".format(step))    # TODO remove
 		# policy evaluation
 		for i in range(args.iterations):
-			print(" Policy evaluation #{}".format(i))    # TODO remove
 			updated_value_function = [0] * GridWorld.states
 			for s in range(GridWorld.states):
 				for probability, reward, next_state in GridWorld.step(s, policy[s]):
@@ -71,13 +80,5 @@ if __name__ == "__main__":
 					action_values[a] += probability * (reward + args.gamma * value_function[next_state])
 			policy[s] = np.argmax(action_values)
 
-	# TODO: The final greedy policy should be in `policy`
-
 	# Print results
-	for l in range(3):
-		for c in range(4):
-			state = l * 4 + c
-			if state >= 5: state -= 1
-			print("        " if l == 1 and c == 1 else "{:-8.2f}".format(value_function[state]), end="")
-			print(" " if l == 1 and c == 1 else GridWorld.actions[policy[state]], end="")
-		print()
+	print_value_and_policy()
