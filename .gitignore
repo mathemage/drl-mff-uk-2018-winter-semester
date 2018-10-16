@@ -173,3 +173,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 /labs/02/results_policy_iteration.txt
+/labs/01/results.txt
