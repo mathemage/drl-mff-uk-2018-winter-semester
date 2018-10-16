@@ -50,6 +50,16 @@ if __name__ == "__main__":
 	# current value function and perform `args.iterations` applications of the
 	# Bellman equation. Perform the policy evaluation synchronously (i.e., do
 	# not overwrite the current value function when computing its improvement).
+	for step in range(args.steps):
+		# policy evaluation
+		for _ in range(args.iteration):
+			updated_value_function = [0] * GridWorld.states
+			for s in range(GridWorld.states):
+				probability, reward, next_state = GridWorld.step(s, policy[s])
+				updated_value_function[s] += probability * (reward + args.gamma * value_function[next_state])
+			value_function = updated_value_function
+		# TODO policy improvement
+		raise NotImplementedError
 
 	# TODO: The final greedy policy should be in `policy`
 
