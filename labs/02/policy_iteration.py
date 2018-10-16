@@ -52,12 +52,14 @@ if __name__ == "__main__":
 	# not overwrite the current value function when computing its improvement).
 	for step in range(args.steps):
 		# policy evaluation
-		for _ in range(args.iteration):
+		for _ in range(args.iterations):
 			updated_value_function = [0] * GridWorld.states
 			for s in range(GridWorld.states):
-				probability, reward, next_state = GridWorld.step(s, policy[s])
-				updated_value_function[s] += probability * (reward + args.gamma * value_function[next_state])
+				for probability, reward, next_state in GridWorld.step(s, policy[s]):
+					updated_value_function[s] += probability * (reward + args.gamma * value_function[next_state])
 			value_function = updated_value_function
+			print("Value function computed")    # TODO remove
+
 		# TODO policy improvement
 		raise NotImplementedError
 
