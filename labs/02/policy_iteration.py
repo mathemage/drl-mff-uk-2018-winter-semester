@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import numpy as np
+
 class GridWorld:
 	# States in the gridworld are the following:
 	# 0 1 2 3
@@ -51,17 +53,23 @@ if __name__ == "__main__":
 	# Bellman equation. Perform the policy evaluation synchronously (i.e., do
 	# not overwrite the current value function when computing its improvement).
 	for step in range(args.steps):
+		print("Policy improvement step #{}".format(step))    # TODO remove
 		# policy evaluation
-		for _ in range(args.iterations):
+		for i in range(args.iterations):
+			print(" Policy evaluation #{}".format(i))    # TODO remove
 			updated_value_function = [0] * GridWorld.states
 			for s in range(GridWorld.states):
 				for probability, reward, next_state in GridWorld.step(s, policy[s]):
 					updated_value_function[s] += probability * (reward + args.gamma * value_function[next_state])
 			value_function = updated_value_function
-			print("Value function computed")    # TODO remove
 
-		# TODO policy improvement
-		raise NotImplementedError
+		# policy improvement
+		for s in range(GridWorld.states):
+			action_values = np.zeros(len(GridWorld.actions))
+			for a, _ in enumerate(GridWorld.actions):
+				for probability, reward, next_state in GridWorld.step(s, a):
+					action_values[a] += probability * (reward + args.gamma * value_function[next_state])
+			policy[s] = np.argmax(action_values)
 
 	# TODO: The final greedy policy should be in `policy`
 
