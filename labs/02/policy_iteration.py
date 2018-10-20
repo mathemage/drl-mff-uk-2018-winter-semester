@@ -8,8 +8,8 @@
 # You can find out ReCodEx id on URL when watching ReCodEx profile.
 # The id has the following format: 01234567-89ab-cdef-0123-456789abcdef.
 #
-# c6ef657e-2082-11e8-9de3-00505601122b (Anastasia Lebedeva) TODO replace for @janrudolf
-# 08a323e8-21f3-11e8-9de3-00505601122b (Karel Ha)           TODO replace for me
+# 090fa5b6-d3cf-11e8-a4be-00505601122b (Jan Rudolf)
+# 08a323e8-21f3-11e8-9de3-00505601122b (Karel Ha)
 #
 
 import numpy as np
