@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON="/home/mathemage/anaconda3/envs/drl-mff-uk-2018-winter-semester/bin/python"
+PYTHON=python
 SCRIPT=./multiarmed_bandits.py
 OUTPUT_FILE="results.txt"
 
