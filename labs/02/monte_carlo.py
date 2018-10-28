@@ -17,17 +17,17 @@ import cart_pole_evaluator
 
 if __name__ == "__main__":
     # Fix random seed
-    np.random.seed(42)
+    np.random.seed(42) # 42
 
     # Parse arguments
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--episodes", default=1000, type=int, help="Training episodes.")
+    parser.add_argument("--episodes", default=5000, type=int, help="Training episodes.")
     parser.add_argument("--render_each", default=None, type=int, help="Render some episodes.")
 
     parser.add_argument("--epsilon", default=0.1, type=float, help="Exploration factor.")
-    parser.add_argument("--epsilon_final", default=None, type=float, help="Final exploration factor.")
-    parser.add_argument("--gamma", default=0.95, type=float, help="Discounting factor.")
+    parser.add_argument("--epsilon_final", default=0.05, type=float, help="Final exploration factor.")
+    parser.add_argument("--gamma", default=0.99, type=float, help="Discounting factor.")
     args = parser.parse_args()
 
     # Create the environment
@@ -65,34 +65,40 @@ if __name__ == "__main__":
 
     reward_per_100_episodes = [0] * 100
     average_rewards = [0] * 100
-    flag_stop_training = False
     # The overall structure of the code follows.
+    epsilon = args.epsilon
     training = True
+
     while training:
         # Perform a training episode
-        state, done = env.reset(start_evaluate=flag_stop_training), False
+        state, done = env.reset(), False
 
         history_per_episode = []
         cumulative_reward_per_episode = 0
 
         while not done:
-            if args.render_each and env.episode and env.episode % args.render_each == 0:
-                env.render()
-
-            if np.random.uniform() > args.epsilon:
+            # if args.render_each and env.episode and env.episode % args.render_each == 0:
+            #     env.render()
+            if np.random.uniform() > epsilon:
                 action = q.argmax(state)
             else:
                 action = np.random.randint(0, env.actions)
 
             next_state, reward, done, _ = env.step(action)
 
-            history_per_episode.append((state, reward, action))
-            state = next_state
-            cumulative_reward_per_episode += reward
+            if done == False:
+                history_per_episode.append((state, reward, action))
+                state = next_state
+                cumulative_reward_per_episode += reward
 
         reward_per_100_episodes.pop(0)
         reward_per_100_episodes.append(cumulative_reward_per_episode)
         # print('average reward', sum(reward_per_100_episodes)/100)
+
+        if epsilon - 1e-7 > 0:
+            epsilon -= 1e-7
+        else:
+            epsilon = 0
 
         goal = 0
 
@@ -110,7 +116,20 @@ if __name__ == "__main__":
         average_rewards.pop(0)
         average_rewards.append(sum(reward_per_100_episodes) / 100)
 
-        if (sum(average_rewards)/100 > 490):
-            flag_stop_training = True
-            print(' STOP training')
+        if (sum(average_rewards)/100 > 491) or env.episode > args.episodes:
+            training = False
+            #print(' STOP training')
     # Perform last 100 evaluation episodes
+
+    for i in range(101):
+        # Perform a training episode
+        state, done = env.reset(start_evaluate=True), False
+
+        while not done:
+            if np.random.uniform() > args.epsilon_final:
+                action = q.argmax(state)
+            else:
+                action = np.random.randint(0, env.actions)
+
+            next_state, reward, done, _ = env.step(action)
+            state = next_state
