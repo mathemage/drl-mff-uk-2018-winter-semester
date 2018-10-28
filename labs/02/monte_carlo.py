@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--epsilon", default=0.1, type=float, help="Exploration factor.")
     parser.add_argument("--epsilon_final", default=0.05, type=float, help="Final exploration factor.")
-    parser.add_argument("--gamma", default=0.9, type=float, help="Discounting factor.")
+    parser.add_argument("--gamma", default=0.99, type=float, help="Discounting factor.")
     args = parser.parse_args()
 
     # Create the environment
@@ -95,7 +95,7 @@ if __name__ == "__main__":
         reward_per_100_episodes.append(cumulative_reward_per_episode)
 
         # epsilon decay
-        if epsilon - 1e-7 > 0: # 7
+        if epsilon - 1e-7 > 0:
             epsilon -= 1e-7
         else:
             epsilon = 0
@@ -118,7 +118,6 @@ if __name__ == "__main__":
 
     # Perform last 100 evaluation episodes
     for i in range(101):
-        # Perform a training episode
         state, done = env.reset(start_evaluate=True), False
 
         while not done:
