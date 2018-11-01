@@ -26,7 +26,10 @@ if __name__ == "__main__":
 	# TODO: Implement Q-learning RL algorithm.
 	#
 	# The overall structure of the code follows.
+	alpha = args.alpha
+	Q = np.zeros((env.states, env.actions))
 
+	training = True
 	while training:
 		# Perform a training episode
 		state, done = env.reset(), False
@@ -34,6 +37,10 @@ if __name__ == "__main__":
 			if args.render_each and env.episode and env.episode % args.render_each == 0:
 				env.render()
 
-			next_state, reward, done, _ = env.step(action)
+			action = None                                     # TODO choose `action` by epsilon-greedy from Q
+			next_state, reward, done, _ = env.step(action)    # take action
+			Q[state, action] += alpha * (reward + args.gamma * np.amax(Q[next_state, :], axis=1) - Q[state, action])  # update Q
+			state = next_state                                # next state
+		Q[state, :] = 0   # action-values at terminal states
 
 	# Perform last 100 evaluation episodes
