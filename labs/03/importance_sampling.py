@@ -55,11 +55,8 @@ if __name__ == "__main__":
 
         for episode_sample in reversed(episode):
             state, action, reward = episode_sample
-
             G = G + reward
-
             C[state] = C[state] + W
-
             V[state] = V[state] + (W/C[state]) * (G - V[state])
 
             # from https://github.com/openai/gym/blob/master/gym/envs/toy_text/frozen_lake.py
@@ -67,16 +64,13 @@ if __name__ == "__main__":
             # DOWN = 1
             # RIGHT = 2
             # UP = 3
-
             if action == 1 or action == 2:
                 target_policy = 0.5
             else:
                 target_policy = 0
-
             W = W * (target_policy/0.25)
             if W == 0:
                 break
-
 
     # Print the final value function V
     for row in V.reshape(4, 4):
