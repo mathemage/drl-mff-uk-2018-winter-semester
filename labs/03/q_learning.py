@@ -10,7 +10,7 @@ if __name__ == "__main__":
 	# Parse arguments
 	import argparse
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--episodes", default=1000, type=int, help="Training episodes.")
+	parser.add_argument("--episodes", default=400, type=int, help="Training episodes.")
 	# parser.add_argument("--episodes", default=10000, type=int, help="Training episodes.")   # TODO uncomment
 	parser.add_argument("--render_each", default=None, type=int, help="Render some episodes.")
 
@@ -56,3 +56,10 @@ if __name__ == "__main__":
 	# TODO decay alpha and epsilon
 
 	# Perform last 100 evaluation episodes
+	for _ in range(100):
+		state, done = env.reset(start_evaluate=True), False
+
+		while not done:
+			action = np.argmax(Q[state, :])                 # greedy
+			next_state, _, done, _ = env.step(action)
+			state = next_state
