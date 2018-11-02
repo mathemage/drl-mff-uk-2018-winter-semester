@@ -42,7 +42,6 @@ if __name__ == "__main__":
 			next_state, reward, done, _ = env.step(action)    # take action
 			Q[state, action] += alpha * (reward + args.gamma * np.amax(Q[next_state, :], axis=1) - Q[state, action])  # update Q
 			state = next_state                                # next state
-		Q[state, :] = 0   # action-values at terminal states
 
 	# TODO decay alpha and epsilon
 
