@@ -33,8 +33,9 @@ if __name__ == "__main__":
 
 	# Behaviour policy is uniformly random.
 	# Target policy uniformly chooses either action 1 or 2.
-	Q = np.zeros(states)    # TODO make Q 2D: (state, action)
-	C = np.zeros(states)    # TODO make C 2D: (state, action)
+	V = np.zeros(states)
+	Q = np.zeros((states, actions,))    # TODO make Q 2D: (state, action)
+	C = np.zeros((states, actions,))    # TODO make C 2D: (state, action)
 
 	for _ in range(args.episodes):
 		state, done = env.reset(), False
@@ -56,24 +57,32 @@ if __name__ == "__main__":
 		for episode_sample in reversed(episode):
 			state, action, reward = episode_sample
 			G = G + reward
-			C[state] = C[state] + W  # TODO update this as 2D
-			Q[state] = Q[state] + (W / C[state]) * (G - Q[state])  # TODO update this as 2D
+			C[state][action] += W  # TODO update this as 2D
+			Q[state][action] += (W / C[state][action]) * (G - Q[state][action])  # TODO update this as 2D
 
 			# from https://github.com/openai/gym/blob/master/gym/envs/toy_text/frozen_lake.py
 			# LEFT = 0
 			# DOWN = 1
 			# RIGHT = 2
 			# UP = 3
+
 			if action == 1 or action == 2:
-				target_policy = 0.5
+				W = W * (0.5/0.25)
 			else:
-				target_policy = 0
-			W = W * (target_policy/0.25)
-			if W == 0:
 				break
+			# W = W * (target_policy/0.25)
+			# W = W * (1/target_policy)
+			# W = W * (den/num)
+
+
+	# TODO compute V from Q (as sum); target policy = \pi, lect 2, slide 3
+	for i in range(states):
+		V[i] = 0.5 * Q[i][1] + 0.5 * Q[i][2] + 0.5 * Q[i][0] + 0.5 * Q[i][3]
+		# V[i] = np.max(Q[i])
+		# V[i] = 0.25 * Q[i][1] + 0.25 * Q[i][2]
+		# V[i] = 0.25 * Q[i][1] + 0.25 * Q[i][2] + 0.25 * Q[i][0] + 0.25 * Q[i][3]
+		# V[i] = 0.5 * Q[i][1]  + 0.5 * Q[i][2]
 
 	# Print the final value function V
-	# TODO compute V from Q (as sum); target policy = \pi, lect 2, slide 3
-	V = None
 	for row in V.reshape(4, 4):
 		print(" ".join(["{:5.2f}".format(x) for x in row]))
