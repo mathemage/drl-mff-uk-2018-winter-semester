@@ -10,7 +10,8 @@ if __name__ == "__main__":
 	# Parse arguments
 	import argparse
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--episodes", default=None, type=int, help="Training episodes.")
+	parser.add_argument("--episodes", default=1000, type=int, help="Training episodes.")
+	# parser.add_argument("--episodes", default=10000, type=int, help="Training episodes.")   # TODO uncomment
 	parser.add_argument("--render_each", default=None, type=int, help="Render some episodes.")
 
 	parser.add_argument("--alpha", default=0.5, type=float, help="Learning rate.")
@@ -31,6 +32,8 @@ if __name__ == "__main__":
 	Q = np.zeros((env.states, env.actions))
 
 	training = True
+	episodes = 1000
+	# last_100_rewards = [0] * 100
 	while training:
 		# Perform a training episode
 		state, done = env.reset(), False
@@ -45,6 +48,10 @@ if __name__ == "__main__":
 			next_state, reward, done, _ = env.step(action)    # take action
 			Q[state, action] += alpha * (reward + args.gamma * np.amax(Q[next_state, :]) - Q[state, action])  # update Q
 			state = next_state                                # next state
+
+		# if (sum(last_100_rewards) / 100 > 492) or env.episode > args.episodes:
+		if env.episode > args.episodes:
+			break
 
 	# TODO decay alpha and epsilon
 
