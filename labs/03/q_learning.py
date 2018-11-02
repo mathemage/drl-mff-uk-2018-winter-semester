@@ -38,9 +38,12 @@ if __name__ == "__main__":
 			if args.render_each and env.episode and env.episode % args.render_each == 0:
 				env.render()
 
-			action = None                                     # TODO choose `action` by epsilon-greedy from Q
+			if np.random.uniform() > args.epsilon:
+				action = np.argmax(Q[state, :])                 # greedy
+			else:
+				action = np.random.randint(env.actions)
 			next_state, reward, done, _ = env.step(action)    # take action
-			Q[state, action] += alpha * (reward + args.gamma * np.amax(Q[next_state, :], axis=1) - Q[state, action])  # update Q
+			Q[state, action] += alpha * (reward + args.gamma * np.amax(Q[next_state, :]) - Q[state, action])  # update Q
 			state = next_state                                # next state
 
 	# TODO decay alpha and epsilon
