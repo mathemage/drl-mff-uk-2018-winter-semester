@@ -27,14 +27,18 @@ if __name__ == "__main__":
 	# TODO: Implement Q-learning RL algorithm.
 	#
 	# The overall structure of the code follows.
-	alpha = args.alpha
-	epsilon = args.epsilon
 	Q = np.zeros((env.states, env.actions))
+	alpha_decay_step = (args.alpha - args.alpha_final) / args.episodes
+	epsilon_decay_step = (args.epsilon - args.epsilon_final) / args.episodes
 
 	training = True
-	episodes = 1000
 	# last_100_rewards = [0] * 100
 	while training:
+		# linearly decay alpha and epsilon
+		alpha = args.alpha - env.episode * alpha_decay_step
+		epsilon = args.epsilon - env.episode * epsilon_decay_step
+		# print("Ep. {}: alpha {}, epsilon {}".format(env.episode, alpha, epsilon))
+
 		# Perform a training episode
 		state, done = env.reset(), False
 		while not done:
@@ -53,7 +57,6 @@ if __name__ == "__main__":
 		if env.episode > args.episodes:
 			break
 
-	# TODO decay alpha and epsilon
 
 	# Perform last 100 evaluation episodes
 	for _ in range(100):
