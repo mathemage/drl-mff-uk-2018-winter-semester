@@ -39,8 +39,8 @@ if __name__ == "__main__":
     for _ in range(args.episodes):
         state, done = env.reset(), False
 
-        rhos = list()
-        rewards = list()
+        rhos = []
+        rewards = []
         flag_compute_importance_sampling = True
 
         # Generate episode
@@ -71,7 +71,7 @@ if __name__ == "__main__":
                 if (C[state] + W_episode) != 0:
                     C[state] = C[state] + W_episode
                     V[state] = V[state] + (W_episode/C[state]) * (return_episode - V[state])
-                passed_states.append(state)
+                # passed_states.append(state)
             idx += 1
 
     # Print the final value function V
