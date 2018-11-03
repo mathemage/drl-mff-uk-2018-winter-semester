@@ -33,9 +33,9 @@ if __name__ == "__main__":
 
 	# Behaviour policy is uniformly random.
 	# Target policy uniformly chooses either action 1 or 2.
-	V = np.zeros(states)
-	Q = np.zeros((states, actions,))    # TODO make Q 2D: (state, action)
-	C = np.zeros((states, actions,))    # TODO make C 2D: (state, action)
+	V = np.zeros(states, dtype=np.float64)
+	Q = np.zeros((states, actions,), dtype=np.float64)
+	C = np.zeros((states, actions,), dtype=np.float64)
 
 	for _ in range(args.episodes):
 		state, done = env.reset(), False
@@ -48,17 +48,17 @@ if __name__ == "__main__":
 			episode.append((state, action, reward))
 			state = next_state
 
-		# TODO: Update Q using weighted importance sampling.
-		G = 0
-		W = 1
-
-		# episode = episode[:-1]
+		G = 0.0
+		W = 1.0
 
 		for episode_sample in reversed(episode):
 			state, action, reward = episode_sample
-			G = G + reward
-			C[state][action] += W  # TODO update this as 2D
-			Q[state][action] += (W / C[state][action]) * (G - Q[state][action])  # TODO update this as 2D
+
+			G = G + reward # gamma = 1, because gamma is not in parameters
+
+			C[state][action] += W
+
+			Q[state][action] += (W / C[state][action]) * (G - Q[state][action])
 
 			# from https://github.com/openai/gym/blob/master/gym/envs/toy_text/frozen_lake.py
 			# LEFT = 0
@@ -67,18 +67,16 @@ if __name__ == "__main__":
 			# UP = 3
 
 			if action == 1 or action == 2:
-				W = W * (0.5/0.25)
+				# target policy is 0.5
+				# behavioral policy is 0.25
+				W = W * (0.5 / 0.25)
 			else:
+				# W is zero, because target policy is zero
 				break
-			# W = W * (target_policy/0.25)
-			# W = W * (1/target_policy)
-			# W = W * (den/num)
 
-
-	# TODO compute V from Q (as sum); target policy = \pi, lect 2, slide 3
 	for i in range(states):
-		V[i] = 0.5 * Q[i][1] + 0.5 * Q[i][2] + 0.5 * Q[i][0] + 0.5 * Q[i][3]
-		# V[i] = np.max(Q[i])
+		#V[i] = 0.5 * Q[i][1] + 0.5 * Q[i][2] + 0.5 * Q[i][0] + 0.5 * Q[i][3]
+		V[i] = np.max(Q[i])
 		# V[i] = 0.25 * Q[i][1] + 0.25 * Q[i][2]
 		# V[i] = 0.25 * Q[i][1] + 0.25 * Q[i][2] + 0.25 * Q[i][0] + 0.25 * Q[i][3]
 		# V[i] = 0.5 * Q[i][1]  + 0.5 * Q[i][2]
