@@ -41,7 +41,6 @@ if __name__ == "__main__":
 
         rhos = []
         rewards = []
-        flag_compute_importance_sampling = True
 
         # Generate episode
         episode = []
@@ -53,26 +52,19 @@ if __name__ == "__main__":
                 episode.append((state, action, reward))
                 rewards.append(reward)
             else:
-                # flag_compute_importance_sampling = False
                 rhos.append(0)
                 episode.append((state, action, reward))
                 rewards.append(reward)
-                # break
 
             state = next_state
 
         # TODO: Update V using weighted importance sampling.
-        idx = 0
-        passed_states = list()
-        for (state, action, reward) in episode:
-            if state not in passed_states: # zkontrolovat, ze je mozne
-                return_episode = np.sum(rewards[idx:])
-                W_episode = np.prod(rhos[idx:])
-                if (C[state] + W_episode) != 0:
-                    C[state] = C[state] + W_episode
-                    V[state] = V[state] + (W_episode/C[state]) * (return_episode - V[state])
-                # passed_states.append(state)
-            idx += 1
+        for idx, (state, action, reward) in enumerate(episode):
+            return_episode = np.sum(rewards[idx:])
+            W_episode = np.prod(rhos[idx:])
+            if (C[state] + W_episode) != 0:
+                C[state] = C[state] + W_episode
+                V[state] = V[state] + (W_episode/C[state]) * (return_episode - V[state])
 
     # Print the final value function V
     for row in V.reshape(4, 4):
