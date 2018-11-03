@@ -39,38 +39,40 @@ if __name__ == "__main__":
     for _ in range(args.episodes):
         state, done = env.reset(), False
 
+        rhos = list()
+        rewards = list()
+        flag_compute_importance_sampling = True
+
         # Generate episode
         episode = []
         while not done:
             action = np.random.choice(actions)
             next_state, reward, done, _ = env.step(action)
-            episode.append((state, action, reward))
+            if action == 1 or action == 2:
+                rhos.append(0.5/0.25)
+                episode.append((state, action, reward))
+                rewards.append(reward)
+            else:
+                # flag_compute_importance_sampling = False
+                rhos.append(0)
+                episode.append((state, action, reward))
+                rewards.append(reward)
+                # break
+
             state = next_state
 
         # TODO: Update V using weighted importance sampling.
-        G = 0
-        W = 1
-
-        # episode = episode[:-1]
-
-        for episode_sample in reversed(episode):
-            state, action, reward = episode_sample
-            G = G + reward
-            C[state] = C[state] + W
-            V[state] = V[state] + (W/C[state]) * (G - V[state])
-
-            # from https://github.com/openai/gym/blob/master/gym/envs/toy_text/frozen_lake.py
-            # LEFT = 0
-            # DOWN = 1
-            # RIGHT = 2
-            # UP = 3
-            if action == 1 or action == 2:
-                target_policy = 0.5
-            else:
-                target_policy = 0
-            W = W * (target_policy/0.25)
-            if W == 0:
-                break
+            idx = 0
+            passed_states = list()
+            for (state, action, reward) in episode:
+                if state not in passed_states: # zkontrolovat, ze je mozne
+                    return_episode = np.sum(rewards[idx:])
+                    W_episode = np.prod(rhos[idx:])
+                    if (C[state] + W_episode) != 0:
+                        C[state] = C[state] + W_episode
+                        V[state] = V[state] + (W_episode/C[state]) * (return_episode - V[state])
+                    passed_states.append(state)
+                idx += 1
 
     # Print the final value function V
     for row in V.reshape(4, 4):
