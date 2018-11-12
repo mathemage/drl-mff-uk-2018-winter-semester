@@ -25,18 +25,18 @@ if __name__ == "__main__":
     parser.add_argument("--episodes", default=None, type=int, help="Training episodes.")
     parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 
-    parser.add_argument("--alpha", default=0.2, type=float, help="Learning rate.")
+    parser.add_argument("--alpha", default=0.05, type=float, help="Learning rate.")
     parser.add_argument("--alpha_final", default=None, type=float, help="Final learning rate.")
-    parser.add_argument("--epsilon", default=0.1, type=float, help="Exploration factor.")
-    parser.add_argument("--epsilon_final", default=0.0005, type=float, help="Final exploration factor.")
-    parser.add_argument("--gamma", default=0.999, type=float, help="Discounting factor.")
+    parser.add_argument("--epsilon", default=0.2, type=float, help="Exploration factor.")
+    parser.add_argument("--epsilon_final", default=0.01, type=float, help="Final exploration factor.")
+    parser.add_argument("--gamma", default=1, type=float, help="Discounting factor.")
     args = parser.parse_args()
 
     # Create the environment
     env = lunar_lander_evaluator.environment()
 
     # The environment has env.states states and env.actions actions.
-    N = 8
+    N = 2
     epsilon = args.epsilon
 
     Q = np.zeros((env.states, env.actions,))
@@ -105,10 +105,10 @@ if __name__ == "__main__":
                 if tau == T - 1:
                     break
                 # epsilon decay
-        if epsilon - 1e-7 > 0:
+        if epsilon - 1e-7 > args.epsilon_final:
             epsilon -= 1e-7
         else:
-            epsilon = 0
+            epsilon = args.epsilon_final
         # if args.epsilon_final:
         #     epsilon
             # epsilon = np.exp(np.interp(env.episode + 1,
