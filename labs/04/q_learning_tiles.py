@@ -13,7 +13,7 @@ if __name__ == "__main__":
     parser.add_argument("--episodes", default=None, type=int, help="Training episodes.")
     parser.add_argument("--render_each", default=None, type=int, help="Render some episodes.")
 
-    parser.add_argument("--alpha", default=None, type=float, help="Learning rate.")
+    parser.add_argument("--alpha", default=0.2, type=float, help="Learning rate.")
     parser.add_argument("--alpha_final", default=None, type=float, help="Final learning rate.")
     parser.add_argument("--epsilon", default=None, type=float, help="Exploration factor.")
     parser.add_argument("--epsilon_final", default=None, type=float, help="Final exploration factor.")
@@ -60,5 +60,5 @@ if __name__ == "__main__":
         state, done = env.reset(evaluating), False
         while not done:
             # TODO: choose action as a greedy action
-            action = ...
+            action = 0
             state, reward, done, _ = env.step(action)
