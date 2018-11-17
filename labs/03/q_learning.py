@@ -56,7 +56,7 @@ if __name__ == "__main__":
 				env.render()
 
 			if np.random.uniform() > args.epsilon:
-				action = np.argmax(Q[state, :])                 # greedy
+				action = np.argmax(Q[state, :])                 # epsilon-greedy
 			else:
 				action = np.random.randint(env.actions)
 			next_state, reward, done, _ = env.step(action)    # take action
