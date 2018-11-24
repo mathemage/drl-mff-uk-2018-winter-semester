@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 import collections
-import logging
 
+import cart_pole_evaluator
 import numpy as np
 import tensorflow as tf
 
-import cart_pole_evaluator
 
 class Network:
 	def __init__(self, threads, seed=42):
@@ -135,7 +134,8 @@ if __name__ == "__main__":
 			state = next_state
 
 		# Decide if we want to start evaluating
-		evaluating = env.episode > 5000
+		training_episodes = 100 * args.episodes
+		evaluating = env.episode > training_episodes
 
 		if not evaluating:
 			if args.epsilon_final:
