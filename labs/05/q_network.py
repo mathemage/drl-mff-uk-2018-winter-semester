@@ -134,8 +134,21 @@ if __name__ == "__main__":
 
 			state = next_state
 
-		# TODO: Decide if we want to start evaluating
+		# Decide if we want to start evaluating
+		evaluating = env.episode > 5000
 
 		if not evaluating:
 			if args.epsilon_final:
 				epsilon = np.exp(np.interp(env.episode + 1, [0, args.episodes], [np.log(args.epsilon), np.log(args.epsilon_final)]))
+		else:
+			break
+
+	# Perform last 100 evaluation episodes
+	for _ in range(100):
+		state, done = env.reset(start_evaluate=True), False
+
+		while not done:
+			q_values = network.predict([state])
+			action = np.argmax(q_values)                 # greedy
+			next_state, _, done, _ = env.step(action)
+			state = next_state
