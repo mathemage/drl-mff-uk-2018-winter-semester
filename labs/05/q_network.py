@@ -47,8 +47,6 @@ class Network:
 		self.session.run(self.training, {self.states: states, self.actions: actions, self.q_values: q_values})
 
 if __name__ == "__main__":
-	logging.basicConfig(level=logging.DEBUG)
-
 	# Fix random seed
 	np.random.seed(42)
 
@@ -126,14 +124,12 @@ if __name__ == "__main__":
 
 				if update_step % args.update_every == 0:
 					target_network.copy_variables_from(network)
-					logging.debug("[update step #{}] Copy weights to target net...".format(update_step))
+					print("[update step #{}] Copying weights to target net...".format(update_step))
 				q_values_in_next_states = target_network.predict(next_states)
 				q_values = rewards + args.gamma * np.max(q_values_in_next_states)
 
 				# After you choose `states`, `actions` and their target `q_values`, train the network
 				network.train(states, actions, q_values)
-
-				logging.debug("[update step #{}] Training net...".format(update_step))
 				update_step += 1
 
 			state = next_state
