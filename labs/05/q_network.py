@@ -104,14 +104,16 @@ if __name__ == "__main__":
 				# perform a training batch of `args.batch_size` uniformly randomly chosen transitions.
 				sampled_indices = np.random.permutation(replay_size)[:args.batch_size]
 
-				raise NotImplementedError
-				transition = None
-				states = []     # TODO
-				actions = []    # TODO
-				q_values = []   # TODO
+				states = []
+				actions = []
+				for i in sampled_indices:
+					transition = replay_buffer[i]
+					states.append(transition.state)
+					actions.append(transition.action)
 
-				# After you choose `states`, `actions` and their target `q_values`,
-				# you train the network as
+				raise NotImplementedError
+				q_values = []   # TODO
+				# After you choose `states`, `actions` and their target `q_values`, train the network
 				network.train(states, actions, q_values)
 
 			state = next_state
