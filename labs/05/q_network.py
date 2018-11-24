@@ -12,7 +12,7 @@ class Network:
 		graph = tf.Graph()
 		graph.seed = seed
 		self.session = tf.Session(graph = graph, config=tf.ConfigProto(inter_op_parallelism_threads=threads,
-																	   intra_op_parallelism_threads=threads))
+																		 intra_op_parallelism_threads=threads))
 
 	def construct(self, args, state_shape, num_actions):
 		with self.session.graph.as_default():
@@ -99,14 +99,16 @@ if __name__ == "__main__":
 			replay_buffer.append(Transition(state, action, reward, done, next_state))
 
 			# If the replay_buffer is large enough,
-			if len(replay_buffer) >= args.batchsize:
+			replay_size = len(replay_buffer)
+			if replay_size >= args.batchsize:
+				# perform a training batch of `args.batch_size` uniformly randomly chosen transitions.
+				sampled_indices = np.random.permutation(replay_size)[:args.batch_size]
+
 				raise NotImplementedError
-				# TODO: perform a training batch
-				# of `args.batch_size` uniformly randomly chosen transitions.
-				#
-				states = None     # TODO
-				actions = None    # TODO
-				q_values = None   # TODO
+				transition = None
+				states = []     # TODO
+				actions = []    # TODO
+				q_values = []   # TODO
 
 				# After you choose `states`, `actions` and their target `q_values`,
 				# you train the network as
