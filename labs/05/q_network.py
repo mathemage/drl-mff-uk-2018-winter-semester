@@ -106,14 +106,17 @@ if __name__ == "__main__":
 
 				states = []
 				actions = []
-				q_values = []
+				rewards = []
+				next_states = []
 				for i in sampled_indices:
 					transition = replay_buffer[i]
 					states.append(transition.state)
 					actions.append(transition.action)
-					# TODO optimize by predicting the whole batch
-					q_values_in_next_state = network.predict([transition.next_state])  # TODO use separate target network?
-					q_values.append(transition.reward + args.gamma * np.max(q_values_in_next_state))
+					rewards.append(transition.reward)
+					next_states.append(transition.next_state)
+
+				q_values_in_next_states = network.predict(next_states)  # TODO use separate target network?
+				q_values = rewards + args.gamma * np.max(q_values_in_next_states)
 
 				# After you choose `states`, `actions` and their target `q_values`, train the network
 				network.train(states, actions, q_values)
