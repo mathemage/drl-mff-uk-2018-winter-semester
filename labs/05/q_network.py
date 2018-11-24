@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import collections
+import logging
 
 import numpy as np
 import tensorflow as tf
@@ -46,6 +47,8 @@ class Network:
 		self.session.run(self.training, {self.states: states, self.actions: actions, self.q_values: q_values})
 
 if __name__ == "__main__":
+	logging.basicConfig(level=logging.DEBUG)
+
 	# Fix random seed
 	np.random.seed(42)
 
@@ -62,6 +65,7 @@ if __name__ == "__main__":
 	parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
+	parser.add_argument("--update_every", default=1000, type=int, help="Update frequency of target network.")
 	args = parser.parse_args()
 
 	# Create the environment
@@ -71,6 +75,10 @@ if __name__ == "__main__":
 	network = Network(threads=args.threads)
 	network.construct(args, env.state_shape, env.actions)
 
+	# Construct the target network
+	target_network = Network(threads=args.threads)
+	target_network.construct(args, env.state_shape, env.actions)
+
 	# Replay memory; maxlen parameter can be passed to deque for a size limit,
 	# which we however do not need in this simple task.
 	replay_buffer = collections.deque()
@@ -78,6 +86,7 @@ if __name__ == "__main__":
 
 	evaluating = False
 	epsilon = args.epsilon
+	update_step = 0
 	while True:
 		# Perform episode
 		state, done = env.reset(evaluating), False
@@ -115,11 +124,17 @@ if __name__ == "__main__":
 					rewards.append(transition.reward)
 					next_states.append(transition.next_state)
 
-				q_values_in_next_states = network.predict(next_states)  # TODO use separate target network?
+				if update_step % args.update_every == 0:
+					target_network.copy_variables_from(network)
+					logging.debug("[update step #{}] Copy weights to target net...".format(update_step))
+				q_values_in_next_states = target_network.predict(next_states)
 				q_values = rewards + args.gamma * np.max(q_values_in_next_states)
 
 				# After you choose `states`, `actions` and their target `q_values`, train the network
 				network.train(states, actions, q_values)
+
+				logging.debug("[update step #{}] Training net...".format(update_step))
+				update_step += 1
 
 			state = next_state
 
