@@ -86,7 +86,7 @@ if __name__ == "__main__":
 				env.render()
 
 			# You can compute the q_values of a given state:
-			q_values = network.predict([state])[0]
+			q_values = network.predict([state])
 			# compute action using epsilon-greedy policy.
 			if np.random.uniform() > epsilon:
 				action = np.argmax(q_values)
