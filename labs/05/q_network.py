@@ -63,7 +63,7 @@ if __name__ == "__main__":
 	parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
-	parser.add_argument("--update_every", default=1000, type=int, help="Update frequency of target network.")
+	parser.add_argument("--update_every", default=10000, type=int, help="Update frequency of target network.")
 	args = parser.parse_args()
 
 	# Create the environment
