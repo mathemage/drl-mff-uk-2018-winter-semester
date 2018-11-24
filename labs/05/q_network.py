@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
 			# You can compute the q_values of a given state:
 			q_values = network.predict([state])[0]
-			# Done: compute action using epsilon-greedy policy.
+			# compute action using epsilon-greedy policy.
 			if np.random.uniform() > epsilon:
 				action = np.argmax(q_values)
 			else:
@@ -98,16 +98,19 @@ if __name__ == "__main__":
 			# Append state, action, reward, done and next_state to replay_buffer
 			replay_buffer.append(Transition(state, action, reward, done, next_state))
 
-			# TODO: If the replay_buffer is large enough, perform a training batch
-			# of `args.batch_size` uniformly randomly chosen transitions.
-			#
-			states = None     # TODO
-			actions = None    # TODO
-			q_values = None   # TODO
+			# If the replay_buffer is large enough,
+			if len(replay_buffer) >= args.batchsize:
+				raise NotImplementedError
+				# TODO: perform a training batch
+				# of `args.batch_size` uniformly randomly chosen transitions.
+				#
+				states = None     # TODO
+				actions = None    # TODO
+				q_values = None   # TODO
 
-			# After you choose `states`, `actions` and their target `q_values`,
-			# you train the network as
-			network.train(states, actions, q_values)
+				# After you choose `states`, `actions` and their target `q_values`,
+				# you train the network as
+				network.train(states, actions, q_values)
 
 			state = next_state
 
