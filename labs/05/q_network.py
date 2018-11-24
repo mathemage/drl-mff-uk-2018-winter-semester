@@ -101,9 +101,13 @@ if __name__ == "__main__":
 			# TODO: If the replay_buffer is large enough, perform a training batch
 			# of `args.batch_size` uniformly randomly chosen transitions.
 			#
+			states = None     # TODO
+			actions = None    # TODO
+			q_values = None   # TODO
+
 			# After you choose `states`, `actions` and their target `q_values`,
 			# you train the network as
-			#   network.train(states, actions, q_values)
+			network.train(states, actions, q_values)
 
 			state = next_state
 
