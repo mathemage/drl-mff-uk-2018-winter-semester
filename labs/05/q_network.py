@@ -106,13 +106,14 @@ if __name__ == "__main__":
 
 				states = []
 				actions = []
+				q_values = []
 				for i in sampled_indices:
 					transition = replay_buffer[i]
 					states.append(transition.state)
 					actions.append(transition.action)
+					q_values_in_next_state = network.predict([transition.next_state])
+					q_values.append(transition.reward + args.gamma * np.max(q_values_in_next_state))
 
-				raise NotImplementedError
-				q_values = []   # TODO
 				# After you choose `states`, `actions` and their target `q_values`, train the network
 				network.train(states, actions, q_values)
 
