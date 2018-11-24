@@ -111,7 +111,8 @@ if __name__ == "__main__":
 					transition = replay_buffer[i]
 					states.append(transition.state)
 					actions.append(transition.action)
-					q_values_in_next_state = network.predict([transition.next_state])
+					# TODO optimize by predicting the whole batch
+					q_values_in_next_state = network.predict([transition.next_state])  # TODO use separate target network?
 					q_values.append(transition.reward + args.gamma * np.max(q_values_in_next_state))
 
 				# After you choose `states`, `actions` and their target `q_values`, train the network
