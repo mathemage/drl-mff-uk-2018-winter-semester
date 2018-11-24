@@ -94,7 +94,7 @@ if __name__ == "__main__":
             # Append state, action, reward, done and next_state to replay_buffer
             replay_buffer.append(Transition(state, action, reward, done, next_state))
 
-            # TODO: If the replay_buffer is large enough, preform a training batch
+            # TODO: If the replay_buffer is large enough, perform a training batch
             # of `args.batch_size` uniformly randomly chosen transitions.
             #
             # After you choose `states`, `actions` and their target `q_values`,
