@@ -76,6 +76,7 @@ if __name__ == "__main__":
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
 	parser.add_argument("--update_every", default=1000, type=int, help="Update frequency of target network.")
+	parser.add_argument("--debug", default=False, type=bool, help="Switch on debug mode.")
 	args = parser.parse_args()
 
 	# Create the environment
@@ -148,7 +149,8 @@ if __name__ == "__main__":
 
 			state = next_state
 
-		print("Loss: {}".format(current_loss))
+		if args.debug:
+			print("Loss: {}".format(current_loss))
 
 		# Decide if we want to start evaluating
 		evaluating = env.episode > training_episodes
