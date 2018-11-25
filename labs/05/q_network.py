@@ -94,7 +94,7 @@ if __name__ == "__main__":
 	import argparse
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--batch_size", default=32, type=int, help="Batch size.")
-	parser.add_argument("--episodes", default=1000, type=int, help="Episodes for epsilon decay.")
+	parser.add_argument("--episodes", default=1024, type=int, help="Episodes for epsilon decay.")
 	parser.add_argument("--epsilon", default=0.3, type=float, help="Exploration factor.")
 	parser.add_argument("--epsilon_final", default=0.01, type=float, help="Final exploration factor.")
 	parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
@@ -138,7 +138,7 @@ if __name__ == "__main__":
 	Transition = collections.namedtuple("Transition", ["state", "action", "reward", "done", "next_state"])
 
 	evaluating = False
-	training_episodes = 3 * args.episodes
+	training_episodes = 2 * args.episodes
 	epsilon = args.epsilon
 	update_step = 0
 	current_loss = None
