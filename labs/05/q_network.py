@@ -182,7 +182,8 @@ if __name__ == "__main__":
 
 				if update_step % args.update_every == 0:
 					target_network.copy_variables_from(network)
-					print("[update step #{}] Copying weights to target net...".format(update_step))
+					if args.debug:
+						print("[update step #{}] Copying weights to target net...".format(update_step))
 				q_values_in_next_states = target_network.predict(next_states)
 				estimates_in_next_states = np.multiply(
 					args.gamma * np.max(q_values_in_next_states, axis=-1),
