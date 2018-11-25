@@ -26,7 +26,7 @@ class Network:
 		self.session = tf.Session(graph = graph, config=tf.ConfigProto(inter_op_parallelism_threads=threads,
 																		 intra_op_parallelism_threads=threads))
 
-	def construct(self, args, state_shape, num_actions):
+	def construct(self, args, state_shape, num_actions, construct_summary=False):
 		with self.session.graph.as_default():
 			self.states = tf.placeholder(tf.float32, [None] + state_shape)
 			self.actions = tf.placeholder(tf.int32, [None])
@@ -43,8 +43,17 @@ class Network:
 			global_step = tf.train.create_global_step()
 			self.training = tf.train.AdamOptimizer(args.learning_rate).minimize(self.loss, global_step=global_step, name="training")
 
+			if construct_summary:
+				self.summary_writer = tf.contrib.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
+				self.summaries = {}
+				with self.summary_writer.as_default(), tf.contrib.summary.always_record_summaries():
+					self.summaries["train"] = [tf.contrib.summary.scalar("train/loss", self.loss)]
+
 			# Initialize variables
 			self.session.run(tf.global_variables_initializer())
+			if construct_summary:
+				with self.summary_writer.as_default():
+					tf.contrib.summary.initialize(session=self.session, graph=self.session.graph)
 
 	def copy_variables_from(self, other):
 		for variable, other_variable in zip(self.session.graph.get_collection(tf.GraphKeys.GLOBAL_VARIABLES),
@@ -55,7 +64,7 @@ class Network:
 		return self.session.run(self.predicted_values, {self.states: states})
 
 	def train(self, states, actions, q_values):
-		loss, _ = self.session.run([self.loss, self.training], {self.states: states, self.actions: actions, self.q_values: q_values})
+		loss, _, _ = self.session.run([self.loss, self.training, self.summaries["train"]], {self.states: states, self.actions: actions, self.q_values: q_values})
 		return loss
 
 if __name__ == "__main__":
@@ -96,7 +105,7 @@ if __name__ == "__main__":
 
 	# Construct the network
 	network = Network(threads=args.threads)
-	network.construct(args, env.state_shape, env.actions)
+	network.construct(args, env.state_shape, env.actions, construct_summary=args.debug)
 
 	# Construct the target network
 	target_network = Network(threads=args.threads)
