@@ -39,7 +39,22 @@ class Network:
 			self.predicted_values = tf.layers.dense(hidden, num_actions)
 
 			# Training
-			self.loss = tf.losses.mean_squared_error(self.q_values, tf.boolean_mask(self.predicted_values, tf.one_hot(self.actions, num_actions)))
+			if args.reward_clipping:
+				deltas = self.q_values - tf.boolean_mask(self.predicted_values, tf.one_hot(self.actions, num_actions))
+				clipped_rewards = tf.clip_by_value(
+					deltas,
+					-1.0,
+					+1.0
+				)
+				self.loss = tf.losses.mean_squared_error(
+          clipped_rewards,
+          tf.zeros_like(clipped_rewards)
+				)
+			else:
+				self.loss = tf.losses.mean_squared_error(
+					self.q_values,
+					tf.boolean_mask(self.predicted_values, tf.one_hot(self.actions, num_actions))
+				)
 			global_step = tf.train.create_global_step()
 			self.training = tf.train.AdamOptimizer(args.learning_rate).minimize(self.loss, global_step=global_step, name="training")
 
@@ -85,6 +100,7 @@ if __name__ == "__main__":
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
 	parser.add_argument("--update_every", default=1000, type=int, help="Update frequency of target network.")
+	parser.add_argument("--reward_clipping", default=False, type=bool, help="Switch on reward clipping.")
 	parser.add_argument("--debug", default=False, type=bool, help="Switch on debug mode.")
 	args = parser.parse_args()
 
