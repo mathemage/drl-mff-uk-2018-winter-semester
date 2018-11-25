@@ -184,7 +184,8 @@ if __name__ == "__main__":
 
 				if update_step % args.update_every == 0:
 					mean_100ep_return = np.mean(env._episode_returns[-100:])
-					if (best_mean_100ep_return is None) or (.8 * best_mean_100ep_return < mean_100ep_return):
+					tolerance = .8
+					if (best_mean_100ep_return is None) or (tolerance * best_mean_100ep_return < mean_100ep_return):
 						target_network.copy_variables_from(network)
 						best_mean_100ep_return = mean_100ep_return
 					if args.debug:
