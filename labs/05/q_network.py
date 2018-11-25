@@ -39,9 +39,9 @@ class Network:
 			self.predicted_values = tf.layers.dense(hidden, num_actions)
 
 			# Training
-			loss = tf.losses.mean_squared_error(self.q_values, tf.boolean_mask(self.predicted_values, tf.one_hot(self.actions, num_actions)))
+			self.loss = tf.losses.mean_squared_error(self.q_values, tf.boolean_mask(self.predicted_values, tf.one_hot(self.actions, num_actions)))
 			global_step = tf.train.create_global_step()
-			self.training = tf.train.AdamOptimizer(args.learning_rate).minimize(loss, global_step=global_step, name="training")
+			self.training = tf.train.AdamOptimizer(args.learning_rate).minimize(self.loss, global_step=global_step, name="training")
 
 			# Initialize variables
 			self.session.run(tf.global_variables_initializer())
@@ -55,7 +55,8 @@ class Network:
 		return self.session.run(self.predicted_values, {self.states: states})
 
 	def train(self, states, actions, q_values):
-		self.session.run(self.training, {self.states: states, self.actions: actions, self.q_values: q_values})
+		loss, _ = self.session.run([self.loss, self.training], {self.states: states, self.actions: actions, self.q_values: q_values})
+		return loss
 
 if __name__ == "__main__":
 	# Fix random seed
@@ -97,6 +98,7 @@ if __name__ == "__main__":
 	training_episodes = 2 * args.episodes
 	epsilon = args.epsilon
 	update_step = 0
+	current_loss = None
 	while True:
 		# Perform episode
 		state, done = env.reset(evaluating), False
@@ -141,10 +143,12 @@ if __name__ == "__main__":
 				q_values = rewards + args.gamma * np.max(q_values_in_next_states, axis=-1)
 
 				# After you choose `states`, `actions` and their target `q_values`, train the network
-				network.train(states, actions, q_values)
+				current_loss = network.train(states, actions, q_values)
 				update_step += 1
 
 			state = next_state
+
+		print("Loss: {}".format(current_loss))
 
 		# Decide if we want to start evaluating
 		evaluating = env.episode > training_episodes
