@@ -79,6 +79,18 @@ if __name__ == "__main__":
 	parser.add_argument("--debug", default=False, type=bool, help="Switch on debug mode.")
 	args = parser.parse_args()
 
+	# Create logdir name
+	if args.debug:
+		import datetime
+		import os
+		args.logdir = "logs/{}-{}-{}".format(
+			os.path.basename(__file__),
+			datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S"),
+			",".join(map(lambda arg:"{}={}".format(*arg), sorted(vars(args).items())))
+		)
+		if not os.path.exists("logs"):
+			os.mkdir("logs") # TF 1.6 will do this by itself
+
 	# Create the environment
 	env = cart_pole_evaluator.environment(discrete=False)
 
