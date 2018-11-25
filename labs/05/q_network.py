@@ -104,10 +104,10 @@ if __name__ == "__main__":
 			if args.render_each and env.episode > 0 and env.episode % args.render_each == 0:
 				env.render()
 
-			# You can compute the q_values of a given state:
-			q_values = network.predict([state])
 			# compute action using epsilon-greedy policy.
 			if np.random.uniform() > epsilon:
+				# You can compute the q_values of a given state:
+				q_values = network.predict([state])
 				action = np.argmax(q_values)
 			else:
 				action = np.random.randint(env.actions)
