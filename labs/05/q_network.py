@@ -171,18 +171,25 @@ if __name__ == "__main__":
 				actions = []
 				rewards = []
 				next_states = []
+				done_list = []
 				for i in sampled_indices:
 					transition = replay_buffer[i]
 					states.append(transition.state)
 					actions.append(transition.action)
 					rewards.append(transition.reward)
 					next_states.append(transition.next_state)
+					done_list.append(transition.done)
 
 				if update_step % args.update_every == 0:
 					target_network.copy_variables_from(network)
 					print("[update step #{}] Copying weights to target net...".format(update_step))
 				q_values_in_next_states = target_network.predict(next_states)
-				q_values = rewards + args.gamma * np.max(q_values_in_next_states, axis=-1)
+				estimates_in_next_states = np.multiply(
+					args.gamma * np.max(q_values_in_next_states, axis=-1),
+					0,
+					where=done_list
+				)
+				q_values = rewards + estimates_in_next_states
 
 				# After you choose `states`, `actions` and their target `q_values`, train the network
 				current_loss = network.train(states, actions, q_values)
