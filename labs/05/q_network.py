@@ -103,7 +103,7 @@ if __name__ == "__main__":
 	parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
-	parser.add_argument("--update_every", default=500, type=int, help="Update frequency of target network.")
+	parser.add_argument("--update_every", default=1024, type=int, help="Update frequency of target network.")
 	parser.add_argument("--replay_buffer_size", default=1024, type=int, help="Maximum size of replay buffer")
 	parser.add_argument("--reward_clipping", default=False, type=bool, help="Switch on reward clipping.")
 	parser.add_argument("--debug", default=False, type=bool, help="Switch on debug mode.")
@@ -198,6 +198,7 @@ if __name__ == "__main__":
 				update_step += 1
 
 			state = next_state
+		# print("replay size after episode {}: {}".format(env.episode, replay_size))
 
 		if args.debug:
 			print("Loss: {}".format(current_loss))
