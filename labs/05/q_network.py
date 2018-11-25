@@ -103,7 +103,7 @@ if __name__ == "__main__":
 	parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
-	parser.add_argument("--update_every", default=1024, type=int, help="Update frequency of target network.")
+	parser.add_argument("--update_every", default=512, type=int, help="Update frequency of target network.")
 	parser.add_argument("--replay_buffer_size", default=4096, type=int, help="Maximum size of replay buffer")
 	parser.add_argument("--reward_clipping", default=False, type=bool, help="Switch on reward clipping.")
 	parser.add_argument("--debug", default=False, type=bool, help="Switch on debug mode.")
@@ -142,6 +142,7 @@ if __name__ == "__main__":
 	epsilon = args.epsilon
 	update_step = 0
 	current_loss = None
+	best_mean_100ep_return = None
 	while True:
 		# Perform episode
 		state, done = env.reset(evaluating), False
@@ -182,7 +183,10 @@ if __name__ == "__main__":
 					done_list.append(transition.done)
 
 				if update_step % args.update_every == 0:
-					target_network.copy_variables_from(network)
+					mean_100ep_return = np.mean(env._episode_returns[-100:])
+					if (best_mean_100ep_return is None) or (.8 * best_mean_100ep_return < mean_100ep_return):
+						target_network.copy_variables_from(network)
+						best_mean_100ep_return = mean_100ep_return
 					if args.debug:
 						print("[update step #{}] Copying weights to target net...".format(update_step))
 				q_values_in_next_states = target_network.predict(next_states)
