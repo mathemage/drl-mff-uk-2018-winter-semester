@@ -104,7 +104,7 @@ if __name__ == "__main__":
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
 	parser.add_argument("--update_every", default=1024, type=int, help="Update frequency of target network.")
-	parser.add_argument("--replay_buffer_size", default=1024, type=int, help="Maximum size of replay buffer")
+	parser.add_argument("--replay_buffer_size", default=4096, type=int, help="Maximum size of replay buffer")
 	parser.add_argument("--reward_clipping", default=False, type=bool, help="Switch on reward clipping.")
 	parser.add_argument("--debug", default=False, type=bool, help="Switch on debug mode.")
 	args = parser.parse_args()
@@ -138,7 +138,7 @@ if __name__ == "__main__":
 	Transition = collections.namedtuple("Transition", ["state", "action", "reward", "done", "next_state"])
 
 	evaluating = False
-	training_episodes = 2 * args.episodes
+	training_episodes = 3 * args.episodes
 	epsilon = args.epsilon
 	update_step = 0
 	current_loss = None
