@@ -211,9 +211,12 @@ if __name__ == "__main__":
 		# Decide if we want to start evaluating
 		evaluating = env.episode > training_episodes
 		early_stop_window = 100
-		if not evaluating and env.episode > early_stop_window:
-			mean_return = np.mean(env._episode_returns[-early_stop_window:])
-			evaluating = mean_return > 400
+		mean_return = [None] * 3
+		if not evaluating and env.episode > early_stop_window + 100:
+			mean_return[0] = np.mean(env._episode_returns[- early_stop_window:])
+			mean_return[1] = np.mean(env._episode_returns[- early_stop_window - 50:-50])
+			mean_return[2] = np.mean(env._episode_returns[- early_stop_window - 100:-100])
+			evaluating = mean_return[0] > 400 and mean_return[1] > 400 and mean_return[2] > 400
 
 		if not evaluating:
 			if args.epsilon_final:
