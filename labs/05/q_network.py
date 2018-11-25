@@ -94,7 +94,7 @@ if __name__ == "__main__":
 	Transition = collections.namedtuple("Transition", ["state", "action", "reward", "done", "next_state"])
 
 	evaluating = False
-	training_episodes = 100 * args.episodes
+	training_episodes = 2 * args.episodes
 	epsilon = args.epsilon
 	update_step = 0
 	while True:
