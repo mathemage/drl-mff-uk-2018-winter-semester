@@ -103,7 +103,8 @@ if __name__ == "__main__":
 	parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
-	parser.add_argument("--update_every", default=5000, type=int, help="Update frequency of target network.")
+	parser.add_argument("--update_every", default=500, type=int, help="Update frequency of target network.")
+	parser.add_argument("--replay_buffer_size", default=1024, type=int, help="Maximum size of replay buffer")
 	parser.add_argument("--reward_clipping", default=False, type=bool, help="Switch on reward clipping.")
 	parser.add_argument("--debug", default=False, type=bool, help="Switch on debug mode.")
 	args = parser.parse_args()
@@ -133,7 +134,7 @@ if __name__ == "__main__":
 
 	# Replay memory; maxlen parameter can be passed to deque for a size limit,
 	# which we however do not need in this simple task.
-	replay_buffer = collections.deque()
+	replay_buffer = collections.deque(maxlen=args.replay_buffer_size)
 	Transition = collections.namedtuple("Transition", ["state", "action", "reward", "done", "next_state"])
 
 	evaluating = False
