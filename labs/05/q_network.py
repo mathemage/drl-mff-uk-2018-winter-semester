@@ -94,6 +94,7 @@ if __name__ == "__main__":
 	Transition = collections.namedtuple("Transition", ["state", "action", "reward", "done", "next_state"])
 
 	evaluating = False
+	training_episodes = 100 * args.episodes
 	epsilon = args.epsilon
 	update_step = 0
 	while True:
@@ -137,7 +138,7 @@ if __name__ == "__main__":
 					target_network.copy_variables_from(network)
 					print("[update step #{}] Copying weights to target net...".format(update_step))
 				q_values_in_next_states = target_network.predict(next_states)
-				q_values = rewards + args.gamma * np.max(q_values_in_next_states)
+				q_values = rewards + args.gamma * np.max(q_values_in_next_states, axis=-1)
 
 				# After you choose `states`, `actions` and their target `q_values`, train the network
 				network.train(states, actions, q_values)
@@ -146,7 +147,6 @@ if __name__ == "__main__":
 			state = next_state
 
 		# Decide if we want to start evaluating
-		training_episodes = 100 * args.episodes
 		evaluating = env.episode > training_episodes
 
 		if not evaluating:
