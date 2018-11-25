@@ -165,7 +165,7 @@ if __name__ == "__main__":
 			replay_size = len(replay_buffer)
 			if replay_size >= args.batch_size:
 				# perform a training batch of `args.batch_size` uniformly randomly chosen transitions.
-				sampled_indices = np.random.permutation(replay_size)[:args.batch_size]
+				sampled_indices = np.random.choice(replay_size, args.batch_size, replace=False)
 
 				states = []
 				actions = []
