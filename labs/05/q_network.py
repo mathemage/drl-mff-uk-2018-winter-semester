@@ -27,6 +27,7 @@ class Network:
 																		 intra_op_parallelism_threads=threads))
 
 	def construct(self, args, state_shape, num_actions, construct_summary=False):
+		self.construct_summary = construct_summary
 		with self.session.graph.as_default():
 			self.states = tf.placeholder(tf.float32, [None] + state_shape)
 			self.actions = tf.placeholder(tf.int32, [None])
@@ -79,8 +80,11 @@ class Network:
 		return self.session.run(self.predicted_values, {self.states: states})
 
 	def train(self, states, actions, q_values):
-		loss, _, _ = self.session.run([self.loss, self.training, self.summaries["train"]], {self.states: states, self.actions: actions, self.q_values: q_values})
-		return loss
+		if self.construct_summary:
+			loss, _, _ = self.session.run([self.loss, self.training, self.summaries["train"]], {self.states: states, self.actions: actions, self.q_values: q_values})
+			return loss
+		else:
+			self.session.run(self.training, {self.states: states, self.actions: actions, self.q_values: q_values})
 
 if __name__ == "__main__":
 	# Fix random seed
