@@ -46,7 +46,7 @@ class Network:
 			# - modify the result to have shape `[batch_size]` (you can use for example `[:, 0]`)
 			baseline = tf.squeeze(expanded_baseline)
 
-			# TODO: Compute `loss` as a sum of two losses:
+			# Compute `loss` as a sum of two losses:
 			# - sparse softmax cross entropy of `self.actions` and `logits`,
 			#   weighted by `self.returns - baseline`. You should not backpropagate
 			#   gradient into `baseline` by using `tf.stop_gradient(baseline)`.
