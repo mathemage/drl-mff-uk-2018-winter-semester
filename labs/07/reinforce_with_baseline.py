@@ -82,7 +82,7 @@ if __name__ == "__main__":
 	parser.add_argument("--episodes", default=200, type=int, help="Training episodes.")
 	parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
 	parser.add_argument("--hidden_layer", default=20, type=int, help="Size of hidden layer.")
-	parser.add_argument("--learning_rate", default=0.01, type=float, help="Learning rate.")
+	parser.add_argument("--learning_rate", default=0.05, type=float, help="Learning rate.")
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
 	args = parser.parse_args()
