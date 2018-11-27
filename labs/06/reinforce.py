@@ -117,9 +117,9 @@ if __name__ == "__main__":
 			returns.reverse()
 
 			# Add states, actions and returns to the training batch
-			batch_states.append(states)
-			batch_actions.append(actions)
-			batch_returns.append(returns)
+			batch_states.extend(states)
+			batch_actions.extend(actions)
+			batch_returns.extend(returns)
 
 		# Train using the generated batch
 		network.train(batch_states, batch_actions, batch_returns)
