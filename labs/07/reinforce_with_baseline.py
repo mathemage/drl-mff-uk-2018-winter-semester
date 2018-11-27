@@ -32,16 +32,19 @@ class Network:
 
 			# Start with self.states and
 			# - add a fully connected layer of size args.hidden_layer and ReLU activation
-			hidden = tf.layers.dense(self.states, args.hidden_layer, activation=tf.nn.relu)
+			hidden_actor = tf.layers.dense(self.states, args.hidden_layer, activation=tf.nn.relu)
 			# - add a fully connected layer with num_actions and no activation, computing `logits`
-			logits = tf.layers.dense(hidden, num_actions)
+			logits = tf.layers.dense(hidden_actor, num_actions)
 			# - compute `self.probabilities` as tf.nn.softmax of `logits`
 			self.probabilities = tf.nn.softmax(logits)
 
-			# TODO: Compute `baseline`, by starting with a fully connected layer processing `self.states` and
+			# Compute `baseline`, by starting with a fully connected layer processing `self.states` and
 			# - add a fully connected layer of size args.hidden_layer and ReLU activation
+			hidden_critic = tf.layers.dense(self.states, args.hidden_layer, activation=tf.nn.relu)
 			# - add a fully connected layer with 1 output and no activation
+			expanded_baseline = tf.layers.dense(hidden_critic, 1)
 			# - modify the result to have shape `[batch_size]` (you can use for example `[:, 0]`)
+			baseline = tf.squeeze(expanded_baseline)
 
 			# TODO: Compute `loss` as a sum of two losses:
 			# - sparse softmax cross entropy of `self.actions` and `logits`,
