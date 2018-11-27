@@ -82,7 +82,7 @@ if __name__ == "__main__":
 					env.render()
 
 				# Compute action probabilities using `network.predict` and current `state`
-				action_probabilities = network.predict([state])
+				action_probabilities = network.predict([state])[0]
 
 				# Choose `action` according to `probabilities` distribution (np.random.choice can be used)
 				action = np.random.choice(env.actions, p=action_probabilities)
@@ -117,7 +117,7 @@ if __name__ == "__main__":
 		state, done = env.reset(True), False
 		while not done:
 			# Compute action `probabilities` using `network.predict` and current `state`
-			action_probabilities = network.predict([state])
+			action_probabilities = network.predict([state])[0]
 
 			# Choose greedy action this time
 			action = np.argmax(action_probabilities)
