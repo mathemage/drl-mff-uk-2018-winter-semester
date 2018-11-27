@@ -26,9 +26,14 @@ class Network:
 			# - compute `self.probabilities` as tf.nn.softmax of `logits`
 			self.probabilities = tf.nn.softmax(logits)
 
-			# TODO: Training
+			# Training
 			# - compute `loss` as sparse softmax cross entropy of `self.actions` and `logits`,
 			# weighted by `self.returns` (using `weights` param)
+			loss = tf.losses.sparse_softmax_cross_entropy(
+				labels=self.actions,
+				logits=logits,
+				weights=self.returns
+			)
 
 			global_step = tf.train.create_global_step()
 			self.training = tf.train.AdamOptimizer(args.learning_rate).minimize(loss, global_step=global_step, name="training")
