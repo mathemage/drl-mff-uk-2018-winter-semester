@@ -22,9 +22,9 @@ class Network:
 			# - add a fully connected layer of size args.hidden_layer and ReLU activation
 			hidden = tf.layers.dense(self.states, args.hidden_layer, activation=tf.nn.relu)
 			# - add a fully connected layer with num_actions and no activation, computing `logits`
-			self.logits = tf.layers.dense(hidden, num_actions)
+			logits = tf.layers.dense(hidden, num_actions)
 			# - compute `self.probabilities` as tf.nn.softmax of `logits`
-			self.probabilities = tf.nn.softmax(self.logits)
+			self.probabilities = tf.nn.softmax(logits)
 
 			# TODO: Training
 			# - compute `loss` as sparse softmax cross entropy of `self.actions` and `logits`,
