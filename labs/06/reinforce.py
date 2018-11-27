@@ -104,7 +104,10 @@ if __name__ == "__main__":
 				returns.append(G)
 			returns.reverse()
 
-			# TODO: Add states, actions and returns to the training batch
+			# Add states, actions and returns to the training batch
+			batch_states.append(states)
+			batch_actions.append(actions)
+			batch_returns.append(returns)
 
 		# Train using the generated batch
 		network.train(batch_states, batch_actions, batch_returns)
