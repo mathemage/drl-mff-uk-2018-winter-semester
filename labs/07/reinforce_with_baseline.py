@@ -78,7 +78,7 @@ if __name__ == "__main__":
 	# Parse arguments
 	import argparse
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--batch_size", default=10, type=int, help="Number of episodes to train on.")
+	parser.add_argument("--batch_size", default=1, type=int, help="Number of episodes to train on.")
 	parser.add_argument("--episodes", default=200, type=int, help="Training episodes.")
 	parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
 	parser.add_argument("--hidden_layer", default=20, type=int, help="Size of hidden layer.")
