@@ -1,4 +1,16 @@
 #!/usr/bin/env python3
+#
+# All team solutions **must** list **all** members of the team.
+# The members must be listed using their ReCodEx ids anywhere
+# in the first comment block in the source file, i.e., in the first
+# consecutive range of lines beginning with `#`.
+#
+# You can find out ReCodEx id on URL when watching ReCodEx profile.
+# The id has the following format: 01234567-89ab-cdef-0123-456789abcdef.
+#
+# 090fa5b6-d3cf-11e8-a4be-00505601122b (Jan Rudolf)
+# 08a323e8-21f3-11e8-9de3-00505601122b (Karel Ha)
+#
 import numpy as np
 import tensorflow as tf
 
@@ -18,10 +30,13 @@ class Network:
 			self.actions = tf.placeholder(tf.int32, [None])
 			self.returns = tf.placeholder(tf.float32, [None])
 
-			# TODO(reinforce): Start with self.states and
+			# Start with self.states and
 			# - add a fully connected layer of size args.hidden_layer and ReLU activation
+			hidden = tf.layers.dense(self.states, args.hidden_layer, activation=tf.nn.relu)
 			# - add a fully connected layer with num_actions and no activation, computing `logits`
+			logits = tf.layers.dense(hidden, num_actions)
 			# - compute `self.probabilities` as tf.nn.softmax of `logits`
+			self.probabilities = tf.nn.softmax(logits)
 
 			# TODO: Compute `baseline`, by starting with a fully connected layer processing `self.states` and
 			# - add a fully connected layer of size args.hidden_layer and ReLU activation
@@ -80,9 +95,11 @@ if __name__ == "__main__":
 				if args.render_each and env.episode > 0 and env.episode % args.render_each == 0:
 					env.render()
 
-				# TODO: Compute action probabilities using `network.predict` and current `state`
+				# Compute action probabilities using `network.predict` and current `state`
+				action_probabilities = network.predict([state])[0]
 
-				# TODO: Choose `action` according to `probabilities` distribution (np.random.choice can be used)
+				# Choose `action` according to `probabilities` distribution (np.random.choice can be used)
+				action = np.random.choice(env.actions, p=action_probabilities)
 
 				next_state, reward, done, _ = env.step(action)
 
@@ -92,9 +109,19 @@ if __name__ == "__main__":
 
 				state = next_state
 
-			# TODO: Compute returns by summing rewards (with discounting)
+			# Compute returns by summing rewards (with discounting)
+			returns = []
+			G = 0
+			for reward in reversed(rewards):
+				G *= args.gamma
+				G += reward
+				returns.append(G)
+			returns.reverse()
 
-			# TODO: Add states, actions and returns to the training batch
+			# Add states, actions and returns to the training batch
+			batch_states.extend(states)
+			batch_actions.extend(actions)
+			batch_returns.extend(returns)
 
 		# Train using the generated batch
 		network.train(batch_states, batch_actions, batch_returns)
@@ -103,8 +130,9 @@ if __name__ == "__main__":
 	while True:
 		state, done = env.reset(True), False
 		while not done:
-			# TODO: Compute action `probabilities` using `network.predict` and current `state`
+			# Compute action `probabilities` using `network.predict` and current `state`
+			action_probabilities = network.predict([state])[0]
 
 			# Choose greedy action this time
-			action = np.argmax(probabilities)
+			action = np.argmax(action_probabilities)
 			state, reward, done, _ = env.step(action)
