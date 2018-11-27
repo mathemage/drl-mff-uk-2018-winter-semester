@@ -81,9 +81,11 @@ if __name__ == "__main__":
 				if args.render_each and env.episode > 0 and env.episode % args.render_each == 0:
 					env.render()
 
-				# TODO: Compute action probabilities using `network.predict` and current `state`
+				# Compute action probabilities using `network.predict` and current `state`
+				action_probabilities = network.predict([state])
 
-				# TODO: Choose `action` according to `probabilities` distribution (np.random.choice can be used)
+				# Choose `action` according to `probabilities` distribution (np.random.choice can be used)
+				action = np.random.choice(env.actions, p=action_probabilities)
 
 				next_state, reward, done, _ = env.step(action)
 
