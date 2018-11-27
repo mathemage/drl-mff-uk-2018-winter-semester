@@ -50,7 +50,14 @@ class Network:
 			# - sparse softmax cross entropy of `self.actions` and `logits`,
 			#   weighted by `self.returns - baseline`. You should not backpropagate
 			#   gradient into `baseline` by using `tf.stop_gradient(baseline)`.
+			loss_actor = tf.losses.sparse_softmax_cross_entropy(
+				labels=self.actions,
+				logits=logits,
+				weights=self.returns - tf.stop_gradient(baseline)
+			)
 			# - mean square error of the `self.returns` and `baseline`
+			loss_critic = tf.losses.mean_squared_error(self.returns, baseline)
+			loss = loss_actor + loss_critic
 
 			global_step = tf.train.create_global_step()
 			self.training = tf.train.AdamOptimizer(args.learning_rate).minimize(loss, global_step=global_step, name="training")
@@ -71,11 +78,11 @@ if __name__ == "__main__":
 	# Parse arguments
 	import argparse
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--batch_size", default=None, type=int, help="Number of episodes to train on.")
-	parser.add_argument("--episodes", default=None, type=int, help="Training episodes.")
+	parser.add_argument("--batch_size", default=10, type=int, help="Number of episodes to train on.")
+	parser.add_argument("--episodes", default=200, type=int, help="Training episodes.")
 	parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
 	parser.add_argument("--hidden_layer", default=20, type=int, help="Size of hidden layer.")
-	parser.add_argument("--learning_rate", default=None, type=float, help="Learning rate.")
+	parser.add_argument("--learning_rate", default=0.01, type=float, help="Learning rate.")
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
 	args = parser.parse_args()
