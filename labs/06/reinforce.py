@@ -95,7 +95,14 @@ if __name__ == "__main__":
 
 				state = next_state
 
-			# TODO: Compute returns by summing rewards (with discounting)
+			# Compute returns by summing rewards (with discounting)
+			returns = []
+			G = 0
+			for reward in reversed(rewards):
+				G *= args.gamma
+				G += reward
+				returns.append(G)
+			returns.reverse()
 
 			# TODO: Add states, actions and returns to the training batch
 
