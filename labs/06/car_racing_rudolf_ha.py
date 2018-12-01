@@ -51,10 +51,11 @@ class Network:
 			# - sparse softmax cross entropy of `self.actions` and `logits`,
 			#   weighted by `self.returns - baseline`. You should not backpropagate
 			#   gradient into `baseline` by using `tf.stop_gradient(baseline)`.
+			weights = self.returns - tf.stop_gradient(baseline)
 			loss_actor = tf.losses.sparse_softmax_cross_entropy(
 				labels=self.actions,
 				logits=logits,
-				weights=self.returns - tf.stop_gradient(baseline)
+				weights=weights
 			)
 			# - mean square error of the `self.returns` and `baseline`
 			loss_critic = tf.losses.mean_squared_error(self.returns, baseline)
@@ -103,9 +104,9 @@ if __name__ == "__main__":
 	discrete_gas = [0, 1]
 	discrete_brake = [0, 1]
 	discretized_actions = np.array([x for x in itertools.product(discrete_steer, discrete_gas, discrete_brake)])
-	raise NotImplementedError
+	action_size = len(discretized_actions)
 	network = Network(threads=args.threads)
-	network.construct(args, env.state_shape, env.actions)
+	network.construct(args, env.state_shape, action_size)
 
 	# Training
 	for _ in range(args.episodes // args.batch_size):
