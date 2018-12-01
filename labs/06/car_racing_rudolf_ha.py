@@ -27,9 +27,9 @@ class Network:
 
 	def construct(self, args, state_shape, num_actions):
 		with self.session.graph.as_default():
-			self.states = tf.placeholder(tf.float32, [None] + state_shape)
-			self.actions = tf.placeholder(tf.int32, [None])
-			self.returns = tf.placeholder(tf.float32, [None])
+			self.states = tf.placeholder(tf.float32, [None] + state_shape, name="states")
+			self.actions = tf.placeholder(tf.int32, [None], name="actions")
+			self.returns = tf.placeholder(tf.float32, [None], name="returns")
 			flattened_input = tf.layers.flatten(self.states)
 
 			# Start with self.states and
