@@ -124,13 +124,13 @@ if __name__ == "__main__":
 				action_probabilities = network.predict([state])[0]
 
 				# Choose `action` according to `probabilities` distribution (np.random.choice can be used)
-				# action = np.random.choice(env.actions, p=action_probabilities)
-				action = [0, 1, 0]
+				action_index = np.random.choice(action_size, p=action_probabilities)
+				action = discretized_actions[action_index]
 
 				next_state, reward, done, _ = env.step(action)
 
 				states.append(state)
-				actions.append(action)
+				actions.append(action_index)
 				rewards.append(reward)
 
 				state = next_state
