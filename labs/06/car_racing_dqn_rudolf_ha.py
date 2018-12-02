@@ -177,7 +177,7 @@ if __name__ == "__main__":
 					q_values = network.predict([state])
 					action_index = np.argmax(q_values)
 				else:
-					action_index = np.random.randint(env.actions)
+					action_index = np.random.randint(action_size)
 				action = discrete_actions[action_index]
 
 				next_state, reward, done, _ = env.step(action, frame_skip=args.frame_skip)
