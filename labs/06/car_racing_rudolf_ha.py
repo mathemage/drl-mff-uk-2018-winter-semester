@@ -95,6 +95,8 @@ if __name__ == "__main__":
 	parser.add_argument("--alpha_final", default=None, type=float, help="Final learning rate.")
 	parser.add_argument("--epsilon", default=None, type=float, help="Exploration factor.")
 	parser.add_argument("--epsilon_final", default=None, type=float, help="Final exploration factor.")
+
+	parser.add_argument("--evaluate", default=False, type=bool, help="Run evaluation phase.")
 	args = parser.parse_args()
 
 	# Create the environment
@@ -152,13 +154,15 @@ if __name__ == "__main__":
 		# Train using the generated batch
 		network.train(batch_states, batch_actions, batch_returns)
 
-	# Final evaluation
-	while True:
-		state, done = env.reset(True), False
-		while not done:
-			# Compute action `probabilities` using `network.predict` and current `state`
-			action_probabilities = network.predict([state])[0]
+	# Final evaluation: Perform last 100 evaluation episodes
+	if args.evaluate:
+		for _ in range(100):
+			state, done = env.reset(start_evaluate=True), False
 
-			# Choose greedy action this time
-			action = np.argmax(action_probabilities)
-			state, reward, done, _ = env.step(action)
+			while not done:
+				# Compute action `probabilities` using `network.predict` and current `state`
+				action_probabilities = network.predict([state])[0]
+
+				# Choose greedy action this time
+				action = np.argmax(action_probabilities)
+				state, reward, done, _ = env.step(action)
