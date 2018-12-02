@@ -167,7 +167,7 @@ if __name__ == "__main__":
 				else:
 					action = np.random.randint(env.actions)
 
-				next_state, reward, done, _ = env.step(action)
+				next_state, reward, done, _ = env.step(action, frame_skip=args.frame_skip)
 
 				# Append state, action, reward, done and next_state to replay_buffer
 				replay_buffer.append(Transition(state, action, reward, done, next_state))
@@ -240,5 +240,5 @@ if __name__ == "__main__":
 			while not done:
 				q_values = network.predict([state])
 				action = np.argmax(q_values)                 # greedy
-				next_state, _, done, _ = env.step(action)
+				next_state, _, done, _ = env.step(action, frame_skip=args.frame_skip)
 				state = next_state
