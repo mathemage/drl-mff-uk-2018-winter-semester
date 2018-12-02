@@ -134,13 +134,14 @@ if __name__ == "__main__":
 		import argparse
 		parser = argparse.ArgumentParser()
 		parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
-		parser.add_argument("--episodes", default=256, type=int, help="Episodes for epsilon decay.")
+		parser.add_argument("--episodes", default=128, type=int, help="Episodes for epsilon decay.")
 		parser.add_argument("--epsilon", default=0.3, type=float, help="Exploration factor.")
 		parser.add_argument("--epsilon_final", default=0.01, type=float, help="Final exploration factor.")
 		parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
 		parser.add_argument("--hidden_layers", default=4, type=int, help="Number of hidden layers.")
 		parser.add_argument("--hidden_layer_size", default=256, type=int, help="Size of hidden layer.")
-		parser.add_argument("--cnn", default=None, type=str, help="Description of the CNN architecture.")
+		parser.add_argument("--cnn", default="C-8-3-1-same,C-32-5-1-same,C-128-7-2-same", type=str,
+		                    help="Description of the CNN architecture.")
 		parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
 		# TODO implement alpha decay
 		parser.add_argument("--alpha", default=None, type=float, help="Learning rate.")
