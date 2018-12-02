@@ -47,7 +47,7 @@ class Network:
 				self.predicted_values = tf.layers.dense(hidden, num_actions, name="output_layer")
 			else:
 				# preprocess image
-				resized_input = tf.image.resize_images(self.states, size=[24, 24])
+				resized_input = tf.image.resize_images(self.states, size=[96, 96])
 
 				cnn_desc = args.cnn.split(',')
 				depth = len(cnn_desc)
@@ -133,7 +133,7 @@ if __name__ == "__main__":
 		# Parse arguments
 		import argparse
 		parser = argparse.ArgumentParser()
-		parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
+		parser.add_argument("--batch_size", default=8, type=int, help="Batch size.")
 		parser.add_argument("--episodes", default=128, type=int, help="Episodes for epsilon decay.")
 		parser.add_argument("--epsilon", default=0.3, type=float, help="Exploration factor.")
 		parser.add_argument("--epsilon_final", default=0.01, type=float, help="Final exploration factor.")
@@ -148,12 +148,12 @@ if __name__ == "__main__":
 		parser.add_argument("--alpha_final", default=None, type=float, help="Final learning rate.")
 		parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 		parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
-		parser.add_argument("--update_every", default=32, type=int, help="Update frequency of target network.")
+		parser.add_argument("--update_every", default=128, type=int, help="Update frequency of target network.")
 		parser.add_argument("--replay_buffer_size", default=16384, type=int, help="Maximum size of replay buffer")
 		parser.add_argument("--reward_clipping", default=False, type=bool, help="Switch on reward clipping.")
 		parser.add_argument("--debug", default=False, type=bool, help="Switch on debug mode.")
 
-		parser.add_argument("--frame_skip", default=8, type=int, help="Repeat actions for given number of frames.")
+		parser.add_argument("--frame_skip", default=16, type=int, help="Repeat actions for given number of frames.")
 		# TODO implement frame_history
 		parser.add_argument("--frame_history", default=1, type=int, help="Number of past frames to stack together.")
 
