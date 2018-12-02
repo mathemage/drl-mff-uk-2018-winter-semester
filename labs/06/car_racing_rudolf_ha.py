@@ -163,5 +163,7 @@ if __name__ == "__main__":
 				action_probabilities = network.predict([state])[0]
 
 				# Choose greedy action this time
-				action = np.argmax(action_probabilities)
+				# action_index = np.argmax(action_probabilities)
+				action_index = np.random.choice(action_size, p=action_probabilities)
+				action = discretized_actions[action_index]
 				state, reward, done, _ = env.step(action)
