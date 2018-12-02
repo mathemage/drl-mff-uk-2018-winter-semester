@@ -105,7 +105,7 @@ if __name__ == "__main__":
 		parser.add_argument("--epsilon_final", default=0.01, type=float, help="Final exploration factor.")
 		parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
 		parser.add_argument("--hidden_layers", default=4, type=int, help="Number of hidden layers.")
-		parser.add_argument("--hidden_layer_size", default=128, type=int, help="Size of hidden layer.")
+		parser.add_argument("--hidden_layer_size", default=256, type=int, help="Size of hidden layer.")
 		parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
 		# TODO implement alpha decay
 		parser.add_argument("--alpha", default=None, type=float, help="Learning rate.")
