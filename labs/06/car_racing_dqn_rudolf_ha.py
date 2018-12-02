@@ -34,8 +34,13 @@ class Network:
 			self.actions = tf.placeholder(tf.int32, [None])
 			self.q_values = tf.placeholder(tf.float32, [None])
 
+			# preprocess image
+			resized_input = tf.image.resize_images(self.states, size=[24, 24])    # TODO or 48x48
+			grayscale_input = tf.image.rgb_to_grayscale(resized_input)
+			flattened_input = tf.layers.flatten(grayscale_input)
+
 			# Compute the q_values
-			hidden = self.states
+			hidden = flattened_input
 			for _ in range(args.hidden_layers):
 				hidden = tf.layers.dense(hidden, args.hidden_layer_size, activation=tf.nn.relu)
 			self.predicted_values = tf.layers.dense(hidden, num_actions)
