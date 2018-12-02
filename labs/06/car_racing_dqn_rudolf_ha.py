@@ -35,7 +35,7 @@ class Network:
 			self.q_values = tf.placeholder(tf.float32, [None])
 
 			# preprocess image
-			resized_input = tf.image.resize_images(self.states, size=[24, 24])    # TODO or 48x48
+			resized_input = tf.image.resize_images(self.states, size=[48, 48])
 			grayscale_input = tf.image.rgb_to_grayscale(resized_input)
 			flattened_input = tf.layers.flatten(grayscale_input)
 
@@ -99,21 +99,21 @@ if __name__ == "__main__":
 		# Parse arguments
 		import argparse
 		parser = argparse.ArgumentParser()
-		parser.add_argument("--batch_size", default=32, type=int, help="Batch size.")
-		parser.add_argument("--episodes", default=1024, type=int, help="Episodes for epsilon decay.")
+		parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
+		parser.add_argument("--episodes", default=256, type=int, help="Episodes for epsilon decay.")
 		parser.add_argument("--epsilon", default=0.3, type=float, help="Exploration factor.")
 		parser.add_argument("--epsilon_final", default=0.01, type=float, help="Final exploration factor.")
 		parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
-		parser.add_argument("--hidden_layers", default=2, type=int, help="Number of hidden layers.")
-		parser.add_argument("--hidden_layer_size", default=20, type=int, help="Size of hidden layer.")
+		parser.add_argument("--hidden_layers", default=4, type=int, help="Number of hidden layers.")
+		parser.add_argument("--hidden_layer_size", default=128, type=int, help="Size of hidden layer.")
 		parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
 		# TODO implement alpha decay
 		parser.add_argument("--alpha", default=None, type=float, help="Learning rate.")
 		parser.add_argument("--alpha_final", default=None, type=float, help="Final learning rate.")
 		parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 		parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
-		parser.add_argument("--update_every", default=512, type=int, help="Update frequency of target network.")
-		parser.add_argument("--replay_buffer_size", default=4096, type=int, help="Maximum size of replay buffer")
+		parser.add_argument("--update_every", default=32, type=int, help="Update frequency of target network.")
+		parser.add_argument("--replay_buffer_size", default=16384, type=int, help="Maximum size of replay buffer")
 		parser.add_argument("--reward_clipping", default=False, type=bool, help="Switch on reward clipping.")
 		parser.add_argument("--debug", default=False, type=bool, help="Switch on debug mode.")
 
@@ -144,7 +144,6 @@ if __name__ == "__main__":
 		discrete_actions = np.array([x for x in itertools.product(discrete_steer, discrete_gas, discrete_brake)])
 		action_size = len(discrete_actions)
 
-		# TODO: Implement a variation to Deep Q Network algorithm.
 		# Construct the network
 		network = Network(threads=args.threads)
 		network.construct(args, env.state_shape, action_size, construct_summary=args.debug)
