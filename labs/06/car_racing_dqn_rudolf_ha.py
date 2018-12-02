@@ -34,16 +34,50 @@ class Network:
 			self.actions = tf.placeholder(tf.int32, [None])
 			self.q_values = tf.placeholder(tf.float32, [None])
 
-			# preprocess image
-			resized_input = tf.image.resize_images(self.states, size=[48, 48])
-			grayscale_input = tf.image.rgb_to_grayscale(resized_input)
-			flattened_input = tf.layers.flatten(grayscale_input)
-
 			# Compute the q_values
-			hidden = flattened_input
-			for _ in range(args.hidden_layers):
-				hidden = tf.layers.dense(hidden, args.hidden_layer_size, activation=tf.nn.relu)
-			self.predicted_values = tf.layers.dense(hidden, num_actions)
+			if args.cnn is None:
+				# preprocess image
+				resized_input = tf.image.resize_images(self.states, size=[48, 48])
+				grayscale_input = tf.image.rgb_to_grayscale(resized_input)
+				flattened_input = tf.layers.flatten(grayscale_input)
+
+				hidden = flattened_input
+				for _ in range(args.hidden_layers):
+					hidden = tf.layers.dense(hidden, args.hidden_layer_size, activation=tf.nn.relu)
+				self.predicted_values = tf.layers.dense(hidden, num_actions, name="output_layer")
+			else:
+				# preprocess image
+				resized_input = tf.image.resize_images(self.states, size=[24, 24])
+
+				cnn_desc = args.cnn.split(',')
+				depth = len(cnn_desc)
+				layers = [None] * (1 + depth)
+				layers[0] = resized_input
+				for l in range(depth):
+					layer_idx = l + 1
+					layer_name = "layer{}-{}".format(l, cnn_desc[l])
+					specs = cnn_desc[l].split('-')
+					# print("...adding layer {} with specs {}".format(layer_name, specs))
+					if specs[0] == 'C':
+						# - C-filters-kernel_size-stride-padding: Add a convolutional layer with ReLU activation and
+						#   specified number of filters, kernel size, stride and padding. Example: C-10-3-1-same
+						layers[layer_idx] = tf.layers.conv2d(inputs=layers[layer_idx - 1], filters=int(specs[1]),
+																								 kernel_size=int(specs[2]), strides=int(specs[3]), padding=specs[4],
+																								 activation=tf.nn.relu, name=layer_name)
+					if specs[0] == 'M':
+						# - M-kernel_size-stride: Add max pooling with specified size and stride. Example: M-3-2
+						layers[layer_idx] = tf.layers.max_pooling2d(inputs=layers[layer_idx - 1], pool_size=int(specs[1]),
+																												strides=int(specs[2]), name=layer_name)
+					if specs[0] == 'F':
+						# - F: Flatten inputs
+						layers[layer_idx] = tf.layers.flatten(inputs=layers[layer_idx - 1], name=layer_name)
+					if specs[0] == 'R':
+						# - R-hidden_layer_size: Add a dense layer with ReLU activation and specified size. Ex: R-100
+						layers[layer_idx] = tf.layers.dense(inputs=layers[layer_idx - 1], units=int(specs[1]), activation=tf.nn.relu,
+																								name=layer_name)
+				# Store result in `features`.
+				features = tf.layers.flatten(inputs=layers[-1], name="flattened_features")
+				self.predicted_values = tf.layers.dense(features, num_actions, activation=None, name="output_layer")
 
 			# Training
 			if args.reward_clipping:
@@ -106,6 +140,7 @@ if __name__ == "__main__":
 		parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
 		parser.add_argument("--hidden_layers", default=4, type=int, help="Number of hidden layers.")
 		parser.add_argument("--hidden_layer_size", default=256, type=int, help="Size of hidden layer.")
+		parser.add_argument("--cnn", default=None, type=str, help="Description of the CNN architecture.")
 		parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
 		# TODO implement alpha decay
 		parser.add_argument("--alpha", default=None, type=float, help="Learning rate.")
