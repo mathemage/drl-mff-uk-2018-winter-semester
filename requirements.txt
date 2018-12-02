@@ -2,3 +2,5 @@ tensorflow==1.11.0
 gym==0.9.5
 numpy==1.15.0
 box2d-py
+scipy
+atari-py
