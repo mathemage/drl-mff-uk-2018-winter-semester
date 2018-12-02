@@ -92,8 +92,6 @@ if __name__ == "__main__":
 
 	parser.add_argument("--alpha", default=None, type=float, help="Learning rate.")
 	parser.add_argument("--alpha_final", default=None, type=float, help="Final learning rate.")
-	parser.add_argument("--epsilon", default=None, type=float, help="Exploration factor.")
-	parser.add_argument("--epsilon_final", default=None, type=float, help="Final exploration factor.")
 
 	parser.add_argument("--evaluate", default=False, type=bool, help="Run evaluation phase.")
 	args = parser.parse_args()
