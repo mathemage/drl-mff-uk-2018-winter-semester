@@ -31,8 +31,9 @@ class Network:
 			self.returns = tf.placeholder(tf.float32, [None], name="returns")
 
 			# preprocess image
-			input = tf.image.rgb_to_grayscale(self.states)
-			flattened_input = tf.layers.flatten(input)
+			resized_input = tf.image.resize_images(self.states, size=[24, 24])
+			grayscale_input = tf.image.rgb_to_grayscale(resized_input)
+			flattened_input = tf.layers.flatten(grayscale_input)
 
 			# Start with self.states and
 			# - add a fully connected layer of size args.hidden_layer and ReLU activation
