@@ -100,7 +100,7 @@ if __name__ == "__main__":
 	env = car_racing_evaluator.environment()
 
 	# Construct the network
-	discrete_steer = [-1, 1]
+	discrete_steer = [-1, 0, 1]
 	discrete_gas = [0, 1]
 	discrete_brake = [0, 1]
 	discretized_actions = np.array([x for x in itertools.product(discrete_steer, discrete_gas, discrete_brake)])
