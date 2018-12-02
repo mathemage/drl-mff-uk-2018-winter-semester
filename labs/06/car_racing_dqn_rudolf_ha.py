@@ -114,6 +114,8 @@ if __name__ == "__main__":
 		parser.add_argument("--frame_skip", default=8, type=int, help="Repeat actions for given number of frames.")
 		# TODO implement frame_history
 		parser.add_argument("--frame_history", default=1, type=int, help="Number of past frames to stack together.")
+
+		parser.add_argument("--evaluate", default=False, type=bool, help="Run evaluation phase.")
 		args = parser.parse_args()
 
 		# Create logdir name
@@ -234,11 +236,12 @@ if __name__ == "__main__":
 				break
 
 		# Perform last 100 evaluation episodes
-		for _ in range(100):
-			state, done = env.reset(start_evaluate=True), False
+		if args.evaluate:
+			for _ in range(100):
+				state, done = env.reset(start_evaluate=True), False
 
-			while not done:
-				q_values = network.predict([state])
-				action = np.argmax(q_values)                 # greedy
-				next_state, _, done, _ = env.step(action, frame_skip=args.frame_skip)
-				state = next_state
+				while not done:
+					q_values = network.predict([state])
+					action = np.argmax(q_values)                 # greedy
+					next_state, _, done, _ = env.step(action, frame_skip=args.frame_skip)
+					state = next_state
