@@ -18,12 +18,11 @@ import itertools
 import car_racing_evaluator
 
 class Network:
-	def __init__(self, threads, seed=42):
+	def __init__(self, seed=None):
 		# Create an empty graph and a session
 		graph = tf.Graph()
 		graph.seed = seed
-		self.session = tf.Session(graph = graph, config=tf.ConfigProto(inter_op_parallelism_threads=threads,
-																																	 intra_op_parallelism_threads=threads))
+		self.session = tf.Session(graph = graph)
 
 	def construct(self, args, state_shape, num_actions):
 		with self.session.graph.as_default():
@@ -108,7 +107,7 @@ if __name__ == "__main__":
 	discrete_brake = [0, 1]
 	discretized_actions = np.array([x for x in itertools.product(discrete_steer, discrete_gas, discrete_brake)])
 	action_size = len(discretized_actions)
-	network = Network(threads=args.threads)
+	network = Network()
 	network.construct(args, env.state_shape, action_size)
 
 	# Training
