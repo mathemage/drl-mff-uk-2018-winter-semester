@@ -31,7 +31,7 @@ class Network:
 			self.returns = tf.placeholder(tf.float32, [None], name="returns")
 
 			# preprocess image
-			resized_input = tf.image.resize_images(self.states, size=[24, 24])
+			resized_input = tf.image.resize_images(self.states, size=[24, 24])    # TODO or 48x48
 			grayscale_input = tf.image.rgb_to_grayscale(resized_input)
 			flattened_input = tf.layers.flatten(grayscale_input)
 
@@ -87,14 +87,17 @@ if __name__ == "__main__":
 	parser.add_argument("--batch_size", default=16, type=int, help="Number of episodes to train on.")
 	parser.add_argument("--episodes", default=2048, type=int, help="Training episodes.")
 	parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
+	# TODO implement multi_layer spec
 	parser.add_argument("--hidden_layer", default=512, type=int, help="Size of hidden layer.")
-	parser.add_argument("--learning_rate", default=0.05, type=float, help="Learning rate.")
+	parser.add_argument("--learning_rate", default=0.01, type=float, help="Learning rate.")
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--frame_skip", default=8, type=int, help="Repeat actions for given number of frames.")
+	# TODO implement frame_history
 	parser.add_argument("--frame_history", default=4, type=int, help="Number of past frames to stack together.")
 
-	parser.add_argument("--alpha", default=None, type=float, help="Learning rate.")
-	parser.add_argument("--alpha_final", default=None, type=float, help="Final learning rate.")
+	# TODO implement alpha decay
+	parser.add_argument("--alpha", default=0.05, type=float, help="Learning rate.")
+	parser.add_argument("--alpha_final", default=0.001, type=float, help="Final learning rate.")
 
 	parser.add_argument("--evaluate", default=False, type=bool, help="Run evaluation phase.")
 	args = parser.parse_args()
@@ -151,6 +154,7 @@ if __name__ == "__main__":
 			batch_actions.extend(actions)
 			batch_returns.extend(returns)
 
+		# TODO early stop
 		# Train using the generated batch
 		network.train(batch_states, batch_actions, batch_returns)
 
