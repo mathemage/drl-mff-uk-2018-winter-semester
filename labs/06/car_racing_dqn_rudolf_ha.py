@@ -12,6 +12,7 @@
 # 08a323e8-21f3-11e8-9de3-00505601122b (Karel Ha)
 #
 import collections
+import itertools
 
 import car_racing_evaluator
 import numpy as np
@@ -132,15 +133,20 @@ if __name__ == "__main__":
 
 		# Create the environment
 		env = car_racing_evaluator.environment()
+		discrete_steer = [-1, 0, 1]
+		discrete_gas = [0, 1]
+		discrete_brake = [0, 1]
+		discrete_actions = np.array([x for x in itertools.product(discrete_steer, discrete_gas, discrete_brake)])
+		action_size = len(discrete_actions)
 
 		# TODO: Implement a variation to Deep Q Network algorithm.
 		# Construct the network
 		network = Network(threads=args.threads)
-		network.construct(args, env.state_shape, env.actions, construct_summary=args.debug)
+		network.construct(args, env.state_shape, action_size, construct_summary=args.debug)
 
 		# Construct the target network
 		target_network = Network(threads=args.threads)
-		target_network.construct(args, env.state_shape, env.actions)
+		target_network.construct(args, env.state_shape, action_size)
 
 		# Replay memory; maxlen parameter can be passed to deque for a size limit,
 		# which we however do not need in this simple task.
@@ -160,14 +166,14 @@ if __name__ == "__main__":
 				if args.render_each and (env.episode + 1) % args.render_each == 0:
 						env.render()
 
-				action = [0, 1, 0]
 				# compute action using epsilon-greedy policy.
 				if np.random.uniform() > epsilon:
 					# You can compute the q_values of a given state:
 					q_values = network.predict([state])
-					action = np.argmax(q_values)
+					action_index = np.argmax(q_values)
 				else:
-					action = np.random.randint(env.actions)
+					action_index = np.random.randint(env.actions)
+				action = discrete_actions[action_index]
 
 				next_state, reward, done, _ = env.step(action, frame_skip=args.frame_skip)
 
@@ -214,7 +220,6 @@ if __name__ == "__main__":
 					update_step += 1
 
 				state = next_state
-			# print("replay size after episode {}: {}".format(env.episode, replay_size))
 
 			if args.debug:
 				print("Loss: {}".format(current_loss))
@@ -242,6 +247,7 @@ if __name__ == "__main__":
 
 				while not done:
 					q_values = network.predict([state])
-					action = np.argmax(q_values)                 # greedy
+					action_index = np.argmax(q_values)                 # greedy
+					action = discrete_actions[action_index]
 					next_state, _, done, _ = env.step(action, frame_skip=args.frame_skip)
 					state = next_state
