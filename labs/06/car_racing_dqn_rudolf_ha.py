@@ -178,7 +178,7 @@ if __name__ == "__main__":
 				next_state, reward, done, _ = env.step(action, frame_skip=args.frame_skip)
 
 				# Append state, action, reward, done and next_state to replay_buffer
-				replay_buffer.append(Transition(state, action, reward, done, next_state))
+				replay_buffer.append(Transition(state, action_index, reward, done, next_state))
 
 				# If the replay_buffer is large enough,
 				replay_size = len(replay_buffer)
@@ -187,14 +187,14 @@ if __name__ == "__main__":
 					sampled_indices = np.random.choice(replay_size, args.batch_size, replace=False)
 
 					states = []
-					actions = []
+					action_indices = []
 					rewards = []
 					next_states = []
 					done_list = []
 					for i in sampled_indices:
 						transition = replay_buffer[i]
 						states.append(transition.state)
-						actions.append(transition.action)
+						action_indices.append(transition.action)
 						rewards.append(transition.reward)
 						next_states.append(transition.next_state)
 						done_list.append(transition.done)
@@ -216,7 +216,7 @@ if __name__ == "__main__":
 					q_values = rewards + estimates_in_next_states
 
 					# After you choose `states`, `actions` and their target `q_values`, train the network
-					current_loss = network.train(states, actions, q_values)
+					current_loss = network.train(states, action_indices, q_values)
 					update_step += 1
 
 				state = next_state
