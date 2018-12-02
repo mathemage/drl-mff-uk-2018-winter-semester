@@ -101,6 +101,9 @@ if __name__ == "__main__":
 		parser.add_argument("--hidden_layers", default=2, type=int, help="Number of hidden layers.")
 		parser.add_argument("--hidden_layer_size", default=20, type=int, help="Size of hidden layer.")
 		parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
+		# TODO implement alpha decay
+		parser.add_argument("--alpha", default=None, type=float, help="Learning rate.")
+		parser.add_argument("--alpha_final", default=None, type=float, help="Final learning rate.")
 		parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 		parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
 		parser.add_argument("--update_every", default=512, type=int, help="Update frequency of target network.")
@@ -108,16 +111,9 @@ if __name__ == "__main__":
 		parser.add_argument("--reward_clipping", default=False, type=bool, help="Switch on reward clipping.")
 		parser.add_argument("--debug", default=False, type=bool, help="Switch on debug mode.")
 
-		parser.add_argument("--episodes", default=None, type=int, help="Training episodes.")
-		parser.add_argument("--frame_skip", default=1, type=int, help="Repeat actions for given number of frames.")
+		parser.add_argument("--frame_skip", default=8, type=int, help="Repeat actions for given number of frames.")
+		# TODO implement frame_history
 		parser.add_argument("--frame_history", default=1, type=int, help="Number of past frames to stack together.")
-		parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
-
-		parser.add_argument("--alpha", default=None, type=float, help="Learning rate.")
-		parser.add_argument("--alpha_final", default=None, type=float, help="Final learning rate.")
-		parser.add_argument("--epsilon", default=None, type=float, help="Exploration factor.")
-		parser.add_argument("--epsilon_final", default=None, type=float, help="Final exploration factor.")
-		parser.add_argument("--gamma", default=None, type=float, help="Discounting factor.")
 		args = parser.parse_args()
 
 		# Create logdir name
