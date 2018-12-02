@@ -125,7 +125,7 @@ if __name__ == "__main__":
 				action_index = np.random.choice(action_size, p=action_probabilities)
 				action = discretized_actions[action_index]
 
-				next_state, reward, done, _ = env.step(action)
+				next_state, reward, done, _ = env.step(action, frame_skip=args.frame_skip)
 
 				states.append(state)
 				actions.append(action_index)
@@ -163,4 +163,4 @@ if __name__ == "__main__":
 				# action_index = np.argmax(action_probabilities)
 				action_index = np.random.choice(action_size, p=action_probabilities)
 				action = discretized_actions[action_index]
-				state, reward, done, _ = env.step(action)
+				state, reward, done, _ = env.step(action, frame_skip=args.frame_skip)
