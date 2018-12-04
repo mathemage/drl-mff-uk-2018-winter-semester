@@ -1,4 +1,16 @@
 #!/usr/bin/env python3
+#
+# All team solutions **must** list **all** members of the team.
+# The members must be listed using their ReCodEx ids anywhere
+# in the first comment block in the source file, i.e., in the first
+# consecutive range of lines beginning with `#`.
+#
+# You can find out ReCodEx id on URL when watching ReCodEx profile.
+# The id has the following format: 01234567-89ab-cdef-0123-456789abcdef.
+#
+# 090fa5b6-d3cf-11e8-a4be-00505601122b (Jan Rudolf)
+# 08a323e8-21f3-11e8-9de3-00505601122b (Karel Ha)
+#
 import numpy as np
 import tensorflow as tf
 
@@ -18,22 +30,36 @@ class Network:
 			self.actions = tf.placeholder(tf.int32, [None])
 			self.returns = tf.placeholder(tf.float32, [None])
 
-			# TODO(reinforce): Start with self.states and
+			# Start with self.states and
 			# - add a fully connected layer of size args.hidden_layer and ReLU activation
+			hidden_actor = tf.layers.dense(self.states, args.hidden_layer, activation=tf.nn.relu)
 			# - add a fully connected layer with num_actions and no activation, computing `logits`
+			logits = tf.layers.dense(hidden_actor, num_actions)
 			# - compute `self.probabilities` as tf.nn.softmax of `logits`
+			self.probabilities = tf.nn.softmax(logits)
 
 			# TODO(reinforce_with_baseline): Compute `self.values`, starting with self.states and
 			# - add a fully connected layer of size args.hidden_layer and ReLU activation
+			hidden_critic = tf.layers.dense(self.states, args.hidden_layer, activation=tf.nn.relu)
 			# - add a fully connected layer with 1 output and no activation
+			expanded_baseline = tf.layers.dense(hidden_critic, 1)
 			# - modify the result to have shape `[batch_size]` (you can use for example `[:, 0]`)
+			baseline = tf.squeeze(expanded_baseline)
 
 			# TODO: Compute `loss` as a sum of three losses:
 			# - sparse softmax cross entropy of `self.actions` and `logits`,
 			#   weighted by `self.returns - tf.stop_gradient(self.values)`.
+			loss_actor = tf.losses.sparse_softmax_cross_entropy(
+				labels=self.actions,
+				logits=logits,
+				weights=self.returns - tf.stop_gradient(baseline)
+			)
 			# - negative value of the distribution entropy (use `entropy` method of
 			#   `tf.distributions.Categorical`) weighted by `args.entropy_regularization`.
+			loss_entropy = None
 			# - mean square error of the `self.returns` and `self.values`
+			loss_critic = tf.losses.mean_squared_error(self.returns, baseline)
+			loss = loss_actor + loss_critic + loss_entropy
 
 			global_step = tf.train.create_global_step()
 			self.training = tf.train.AdamOptimizer(args.learning_rate).minimize(loss, global_step=global_step, name="training")
