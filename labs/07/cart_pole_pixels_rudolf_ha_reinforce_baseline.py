@@ -107,7 +107,7 @@ if __name__ == "__main__":
 	# Parse arguments
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--checkpoint", default=None, type=str, help="Checkpoint path.")
-	parser.add_argument("--batch_size", default=16, type=int, help="Number of episodes to train on.")
+	parser.add_argument("--batch_size", default=32, type=int, help="Number of episodes to train on.")
 	parser.add_argument("--episodes", default=2048, type=int, help="Training episodes.")
 	parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
 	# TODO implement multi_layer spec
