@@ -140,9 +140,7 @@ if __name__ == "__main__":
 			pass
 		network.load(args.checkpoint)
 	else:
-		# TODO: Training
-		# while not evaluating:
-		# 	pass
+		# Training
 		for _ in range(args.episodes // args.batch_size):
 			batch_states, batch_actions, batch_returns = [], [], []
 			for _ in range(args.batch_size):
@@ -157,13 +155,12 @@ if __name__ == "__main__":
 					action_probabilities = network.predict([state])[0]
 
 					# Choose `action` according to `probabilities` distribution (np.random.choice can be used)
-					action_index = np.random.choice(action_size, p=action_probabilities)
-					action = discretized_actions[action_index]
+					action = np.random.choice(env.actions, p=action_probabilities)
 
-					next_state, reward, done, _ = env.step(action, frame_skip=args.frame_skip)
+					next_state, reward, done, _ = env.step(action)
 
 					states.append(state)
-					actions.append(action_index)
+					actions.append(action)
 					rewards.append(reward)
 
 					state = next_state
@@ -199,7 +196,5 @@ if __name__ == "__main__":
 				action_probabilities = network.predict([state])[0]
 
 				# Choose greedy action this time
-				# action_index = np.argmax(action_probabilities)
-				action_index = np.random.choice(action_size, p=action_probabilities)
-				action = discretized_actions[action_index]
-				state, reward, done, _ = env.step(action, frame_skip=args.frame_skip)
+				action = np.argmax(action_probabilities)
+				state, reward, done, _ = env.step(action)
