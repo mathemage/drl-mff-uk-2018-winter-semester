@@ -139,9 +139,6 @@ if __name__ == "__main__":
 		except:
 			pass
 		network.load(args.checkpoint)
-
-		# TODO: Evaluation
-
 	else:
 		# TODO: Training
 		# while not evaluating:
@@ -192,17 +189,17 @@ if __name__ == "__main__":
 		# Save the trained model
 		network.save("cart_pole_pixels/model")
 
-		# Final evaluation: Perform last 100 evaluation episodes
-		if args.evaluate:
-			for _ in range(100):
-				state, done = env.reset(start_evaluate=True), False
+	# Final evaluation: Perform last 100 evaluation episodes
+	if args.evaluate:
+		for _ in range(100):
+			state, done = env.reset(start_evaluate=True), False
 
-				while not done:
-					# Compute action `probabilities` using `network.predict` and current `state`
-					action_probabilities = network.predict([state])[0]
+			while not done:
+				# Compute action `probabilities` using `network.predict` and current `state`
+				action_probabilities = network.predict([state])[0]
 
-					# Choose greedy action this time
-					# action_index = np.argmax(action_probabilities)
-					action_index = np.random.choice(action_size, p=action_probabilities)
-					action = discretized_actions[action_index]
-					state, reward, done, _ = env.step(action, frame_skip=args.frame_skip)
+				# Choose greedy action this time
+				# action_index = np.argmax(action_probabilities)
+				action_index = np.random.choice(action_size, p=action_probabilities)
+				action = discretized_actions[action_index]
+				state, reward, done, _ = env.step(action, frame_skip=args.frame_skip)
