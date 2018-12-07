@@ -45,7 +45,9 @@ class Network:
 
 			# Start with self.states and
 			# - add a fully connected layer of size args.hidden_layer and ReLU activation
-			hidden_actor = tf.layers.dense(input, args.hidden_layer, activation=tf.nn.relu)
+			hidden_actor = input
+			for _ in range(args.hidden_layers):
+				hidden_actor = tf.layers.dense(hidden_actor, args.hidden_layer_size, activation=tf.nn.relu)
 			# - add a fully connected layer with num_actions and no activation, computing `logits`
 			logits = tf.layers.dense(hidden_actor, num_actions)
 			# - compute `self.probabilities` as tf.nn.softmax of `logits`
@@ -53,7 +55,9 @@ class Network:
 
 			# Compute `baseline`, by starting with a fully connected layer processing `self.states` and
 			# - add a fully connected layer of size args.hidden_layer and ReLU activation
-			hidden_critic = tf.layers.dense(input, args.hidden_layer, activation=tf.nn.relu)
+			hidden_critic = input
+			for _ in range(args.hidden_layers):
+				hidden_critic = tf.layers.dense(hidden_critic, args.hidden_layer_size, activation=tf.nn.relu)
 			# - add a fully connected layer with 1 output and no activation
 			expanded_baseline = tf.layers.dense(hidden_critic, 1)
 			# - modify the result to have shape `[batch_size]` (you can use for example `[:, 0]`)
@@ -110,8 +114,8 @@ if __name__ == "__main__":
 	parser.add_argument("--batch_size", default=32, type=int, help="Number of episodes to train on.")
 	parser.add_argument("--episodes", default=2048, type=int, help="Training episodes.")
 	parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
-	# TODO implement multi_layer spec
-	parser.add_argument("--hidden_layer", default=512, type=int, help="Size of hidden layer.")
+	parser.add_argument("--hidden_layers", default=2, type=int, help="Number of hidden layers.")
+	parser.add_argument("--hidden_layer_size", default=256, type=int, help="Size of hidden layer.")
 	parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
