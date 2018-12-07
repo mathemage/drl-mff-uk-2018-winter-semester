@@ -52,6 +52,17 @@ class Network:
 			# - modify the result to have shape `[batch_size]` (you can use for example `[:, 0]`)
 			baseline = tf.squeeze(expanded_baseline)
 
+			# TODO: Add network running inference.
+			#
+			# For generality, we assume the result is in `self.predictions`.
+			#
+			# Only this part of the network will be saved, in order not to save
+			# optimizer variables (e.g., estimates of the gradient moments).
+
+			# Saver for the inference network
+			self.saver = tf.train.Saver()
+
+			# Training using operation `self.training`.
 			# Compute `loss` as a sum of two losses:
 			# - sparse softmax cross entropy of `self.actions` and `logits`,
 			#   weighted by `self.returns - baseline`. You should not backpropagate
@@ -66,17 +77,6 @@ class Network:
 			loss_critic = tf.losses.mean_squared_error(self.returns, baseline)
 			loss = loss_actor + loss_critic
 
-			# TODO: Add network running inference.
-			#
-			# For generality, we assume the result is in `self.predictions`.
-			#
-			# Only this part of the network will be saved, in order not to save
-			# optimizer variables (e.g., estimates of the gradient moments).
-
-			# Saver for the inference network
-			self.saver = tf.train.Saver()
-
-			# TODO: Training using operation `self.training`.
 			global_step = tf.train.create_global_step()
 			self.training = tf.train.AdamOptimizer(args.learning_rate).minimize(loss, global_step=global_step, name="training")
 
