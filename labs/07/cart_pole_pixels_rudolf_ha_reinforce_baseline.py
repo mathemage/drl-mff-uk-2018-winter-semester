@@ -30,10 +30,17 @@ class Network:
 			self.actions = tf.placeholder(tf.int32, [None], name="actions")
 			self.returns = tf.placeholder(tf.float32, [None], name="returns")
 
+			# Add network running inference.
+			#
+			# For generality, we assume the result is in `self.predictions`.
+			#
+			# Only this part of the network will be saved, in order not to save
+			# optimizer variables (e.g., estimates of the gradient moments).
+
 			# preprocess image
-			resized_input = tf.image.resize_images(self.states, size=[40, 40])    # TODO or 48x48
+			resized_input = tf.image.resize_images(self.states, size=[40, 40])
 			grayscale_input = tf.image.rgb_to_grayscale(resized_input)
-			flattened_input = tf.layers.flatten(grayscale_input)
+			flattened_input = tf.layers.flatten(grayscale_input)    # TODO conv layers
 			input = flattened_input
 
 			# Start with self.states and
@@ -42,7 +49,7 @@ class Network:
 			# - add a fully connected layer with num_actions and no activation, computing `logits`
 			logits = tf.layers.dense(hidden_actor, num_actions)
 			# - compute `self.probabilities` as tf.nn.softmax of `logits`
-			self.probabilities = tf.nn.softmax(logits)
+			self.predictions = tf.nn.softmax(logits)
 
 			# Compute `baseline`, by starting with a fully connected layer processing `self.states` and
 			# - add a fully connected layer of size args.hidden_layer and ReLU activation
@@ -51,13 +58,6 @@ class Network:
 			expanded_baseline = tf.layers.dense(hidden_critic, 1)
 			# - modify the result to have shape `[batch_size]` (you can use for example `[:, 0]`)
 			baseline = tf.squeeze(expanded_baseline)
-
-			# TODO: Add network running inference.
-			#
-			# For generality, we assume the result is in `self.predictions`.
-			#
-			# Only this part of the network will be saved, in order not to save
-			# optimizer variables (e.g., estimates of the gradient moments).
 
 			# Saver for the inference network
 			self.saver = tf.train.Saver()
