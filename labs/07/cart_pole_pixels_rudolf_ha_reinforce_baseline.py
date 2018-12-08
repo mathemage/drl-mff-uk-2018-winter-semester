@@ -66,7 +66,7 @@ class Network:
 			# optimizer variables (e.g., estimates of the gradient moments).
 
 			# preprocess image
-			resized_input = tf.image.resize_images(self.states, size=[80, 80])
+			resized_input = tf.image.resize_images(self.states, size=[40, 40])
 			grayscale_input = tf.image.rgb_to_grayscale(resized_input)
 			input = grayscale_input
 
