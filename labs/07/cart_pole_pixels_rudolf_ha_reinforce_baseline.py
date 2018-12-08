@@ -142,10 +142,6 @@ if __name__ == "__main__":
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=1024, type=int, help="Maximum number of threads to use.")
 
-	# TODO implement alpha decay
-	parser.add_argument("--alpha", default=0.05, type=float, help="Learning rate.")
-	parser.add_argument("--alpha_final", default=0.001, type=float, help="Final learning rate.")
-
 	parser.add_argument("--evaluate", default=True, type=bool, help="Run evaluation phase.")
 	args = parser.parse_args()
 
