@@ -24,6 +24,34 @@ class Network:
 		self.session = tf.Session(graph = graph, config=tf.ConfigProto(inter_op_parallelism_threads=threads,
 		                                                               intra_op_parallelism_threads=threads))
 
+	def construct_conv_layers(self, cnn_desc, input, name_prefix):
+		depth = len(cnn_desc)
+		layers = [None] * (1 + depth)
+		layers[0] = input
+		for l in range(depth):
+			layer_idx = l + 1
+			layer_name = "{}_layer{}-{}".format(name_prefix, l, cnn_desc[l])
+			specs = cnn_desc[l].split('-')
+			# print("...adding layer {} with specs {}".format(layer_name, specs))
+			if specs[0] == 'C':
+				# - C-filters-kernel_size-stride-padding: Add a convolutional layer with ReLU activation and
+				#   specified number of filters, kernel size, stride and padding. Example: C-10-3-1-same
+				layers[layer_idx] = tf.layers.conv2d(inputs=layers[layer_idx - 1], filters=int(specs[1]),
+				                                     kernel_size=int(specs[2]), strides=int(specs[3]), padding=specs[4],
+				                                     activation=tf.nn.relu, name=layer_name)
+			if specs[0] == 'M':
+				# - M-kernel_size-stride: Add max pooling with specified size and stride. Example: M-3-2
+				layers[layer_idx] = tf.layers.max_pooling2d(inputs=layers[layer_idx - 1], pool_size=int(specs[1]),
+				                                            strides=int(specs[2]), name=layer_name)
+			if specs[0] == 'F':
+				# - F: Flatten inputs
+				layers[layer_idx] = tf.layers.flatten(inputs=layers[layer_idx - 1], name=layer_name)
+			if specs[0] == 'R':
+				# - R-hidden_layer_size: Add a dense layer with ReLU activation and specified size. Ex: R-100
+				layers[layer_idx] = tf.layers.dense(inputs=layers[layer_idx - 1], units=int(specs[1]), activation=tf.nn.relu,
+				                                    name=layer_name)
+		return layers
+
 	def construct(self, args, state_shape, num_actions):
 		with self.session.graph.as_default():
 			self.states = tf.placeholder(tf.float32, [None] + state_shape, name="states")
@@ -38,28 +66,22 @@ class Network:
 			# optimizer variables (e.g., estimates of the gradient moments).
 
 			# preprocess image
-			resized_input = tf.image.resize_images(self.states, size=[40, 40])
+			resized_input = tf.image.resize_images(self.states, size=[80, 80])
 			grayscale_input = tf.image.rgb_to_grayscale(resized_input)
-			flattened_input = tf.layers.flatten(grayscale_input)    # TODO conv layers
-			input = flattened_input
+			input = grayscale_input
 
-			# Start with self.states and
-			# - add a fully connected layer of size args.hidden_layer and ReLU activation
-			hidden_actor = input
-			for _ in range(args.hidden_layers):
-				hidden_actor = tf.layers.dense(hidden_actor, args.hidden_layer_size, activation=tf.nn.relu)
-			# - add a fully connected layer with num_actions and no activation, computing `logits`
-			logits = tf.layers.dense(hidden_actor, num_actions)
-			# - compute `self.probabilities` as tf.nn.softmax of `logits`
+			cnn_desc = args.cnn.split(',')
+
+			# policy network - "actor"
+			actor_layers = self.construct_conv_layers(cnn_desc, input, name_prefix="actor")
+			actor_features = tf.layers.flatten(inputs=actor_layers[-1], name="flattened_features_of_actor")
+			logits = tf.layers.dense(actor_features, num_actions)
 			self.predictions = tf.nn.softmax(logits)
 
-			# Compute `baseline`, by starting with a fully connected layer processing `self.states` and
-			# - add a fully connected layer of size args.hidden_layer and ReLU activation
-			hidden_critic = input
-			for _ in range(args.hidden_layers):
-				hidden_critic = tf.layers.dense(hidden_critic, args.hidden_layer_size, activation=tf.nn.relu)
-			# - add a fully connected layer with 1 output and no activation
-			expanded_baseline = tf.layers.dense(hidden_critic, 1)
+			# baseline network - "critic"
+			critic_layers = self.construct_conv_layers(cnn_desc, input, name_prefix="critic")
+			critic_features = tf.layers.flatten(inputs=critic_layers[-1], name="flattened_features_of_critic")
+			expanded_baseline = tf.layers.dense(critic_features, 1)
 			# - modify the result to have shape `[batch_size]` (you can use for example `[:, 0]`)
 			baseline = tf.squeeze(expanded_baseline)
 
@@ -112,10 +134,10 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--checkpoint", default=None, type=str, help="Checkpoint path.")
 	parser.add_argument("--batch_size", default=32, type=int, help="Number of episodes to train on.")
-	parser.add_argument("--episodes", default=2048, type=int, help="Training episodes.")
+	parser.add_argument("--episodes", default=8192, type=int, help="Training episodes.")
 	parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
-	parser.add_argument("--hidden_layers", default=2, type=int, help="Number of hidden layers.")
-	parser.add_argument("--hidden_layer_size", default=256, type=int, help="Size of hidden layer.")
+	parser.add_argument("--cnn", default="C-8-3-1-same,C-32-5-1-same,C-128-7-2-same", type=str,
+	                    help="Description of the CNN architecture.")
 	parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
