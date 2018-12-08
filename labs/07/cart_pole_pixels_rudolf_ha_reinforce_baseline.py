@@ -136,11 +136,11 @@ if __name__ == "__main__":
 	parser.add_argument("--batch_size", default=32, type=int, help="Number of episodes to train on.")
 	parser.add_argument("--episodes", default=8192, type=int, help="Training episodes.")
 	parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
-	parser.add_argument("--cnn", default="C-8-3-1-same,C-32-5-1-same,C-128-7-2-same", type=str,
+	parser.add_argument("--cnn", default="C-8-3-1-same,C-32-5-1-same", type=str,
 	                    help="Description of the CNN architecture.")
 	parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
-	parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
+	parser.add_argument("--threads", default=1024, type=int, help="Maximum number of threads to use.")
 
 	# TODO implement alpha decay
 	parser.add_argument("--alpha", default=0.05, type=float, help="Learning rate.")
