@@ -83,7 +83,7 @@ class Network:
 			critic_features = tf.layers.flatten(inputs=critic_layers[-1], name="flattened_features_of_critic")
 			expanded_baseline = tf.layers.dense(critic_features, 1)
 			# - modify the result to have shape `[batch_size]` (you can use for example `[:, 0]`)
-			baseline = tf.squeeze(expanded_baseline)
+			self.baseline = tf.squeeze(expanded_baseline)
 
 			# Saver for the inference network
 			self.saver = tf.train.Saver()
@@ -93,14 +93,14 @@ class Network:
 			# - sparse softmax cross entropy of `self.actions` and `logits`,
 			#   weighted by `self.returns - baseline`. You should not backpropagate
 			#   gradient into `baseline` by using `tf.stop_gradient(baseline)`.
-			weights = self.returns - tf.stop_gradient(baseline)
+			weights = self.returns - tf.stop_gradient(self.baseline)
 			loss_actor = tf.losses.sparse_softmax_cross_entropy(
 				labels=self.actions,
 				logits=logits,
 				weights=weights
 			)
 			# - mean square error of the `self.returns` and `baseline`
-			loss_critic = tf.losses.mean_squared_error(self.returns, baseline)
+			loss_critic = tf.losses.huber_loss(self.returns, self.baseline)
 			loss = loss_actor + loss_critic
 
 			global_step = tf.train.create_global_step()
@@ -111,6 +111,9 @@ class Network:
 
 	def predict(self, states):
 		return self.session.run(self.predictions, {self.states: states})
+
+	def critic(self, states):
+		return self.session.run(self.baseline, {self.states: states})
 
 	def train(self, states, actions, returns):
 		self.session.run(self.training, {self.states: states, self.actions: actions, self.returns: returns })
@@ -133,7 +136,6 @@ if __name__ == "__main__":
 	# Parse arguments
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--checkpoint", default=None, type=str, help="Checkpoint path.")
-	parser.add_argument("--batch_size", default=32, type=int, help="Number of episodes to train on.")
 	parser.add_argument("--episodes", default=8192, type=int, help="Training episodes.")
 	parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
 	parser.add_argument("--cnn", default="C-4-3-1-same,C-8-5-1-same,C-16-7-1-same", type=str,
@@ -163,47 +165,25 @@ if __name__ == "__main__":
 		network.load(args.checkpoint)
 	else:
 		# Training
-		for _ in range(args.episodes // args.batch_size):
-			batch_states, batch_actions, batch_returns = [], [], []
-			for _ in range(args.batch_size):
-				# Perform episode
-				states, actions, rewards = [], [], []
-				state, done = env.reset(), False
-				while not done:
-					if args.render_each and env.episode > 0 and env.episode % args.render_each == 0:
-						env.render()
+		for _ in range(args.episodes):
+			# Perform episode
+			state, done = env.reset(), False
+			while not done:
+				if args.render_each and env.episode > 0 and env.episode % args.render_each == 0:
+					env.render()
 
-					# Compute action probabilities using `network.predict` and current `state`
-					action_probabilities = network.predict([state])[0]
+				action_probabilities = network.predict([state])[0]
+				action = np.random.choice(env.actions, p=action_probabilities)
+				next_state, reward, done, _ = env.step(action)
 
-					# Choose `action` according to `probabilities` distribution (np.random.choice can be used)
-					action = np.random.choice(env.actions, p=action_probabilities)
+				delta = reward
+				if not done:
+					critic_next_state = network.critic([next_state])
+					delta += args.gamma * critic_next_state
 
-					next_state, reward, done, _ = env.step(action)
-
-					states.append(state)
-					actions.append(action)
-					rewards.append(reward)
-
-					state = next_state
-
-				# Compute returns by summing rewards (with discounting)
-				returns = []
-				G = 0
-				for reward in reversed(rewards):
-					G *= args.gamma
-					G += reward
-					returns.append(G)
-				returns.reverse()
-
-				# Add states, actions and returns to the training batch
-				batch_states.extend(states)
-				batch_actions.extend(actions)
-				batch_returns.extend(returns)
-
-			# TODO early stop
-			# Train using the generated batch
-			network.train(batch_states, batch_actions, batch_returns)
+				# TODO early stop
+				network.train([state], [action], [delta])
+				state = next_state
 
 		# Save the trained model
 		network.save("cart_pole_pixels/model")
