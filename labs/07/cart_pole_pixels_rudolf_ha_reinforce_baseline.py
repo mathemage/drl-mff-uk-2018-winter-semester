@@ -169,6 +169,9 @@ if __name__ == "__main__":
 			pass
 		network.load(args.checkpoint)
 	else:
+		best_mean_return = 0
+		episode_window = 100
+		best_model_path = "cart_pole_pixels/model_best_{}-episode_return".format(episode_window)
 		# Training
 		for _ in range(args.episodes // args.batch_size):
 			batch_states, batch_actions, batch_returns = [], [], []
@@ -208,12 +211,30 @@ if __name__ == "__main__":
 				batch_actions.extend(actions)
 				batch_returns.extend(returns)
 
-			# TODO early stop
+			# early stop: save the best model so far
+			if env.episode >= episode_window:
+				mean_return = np.mean(env._episode_returns[- episode_window:])
+				if mean_return > best_mean_return:
+					print("mean {}-episode return: {} > {} \t -> storing to '{}'".format(
+						episode_window,
+						mean_return,
+						best_mean_return,
+						best_model_path)
+					)
+					best_mean_return = mean_return
+					network.save(best_model_path)
+
 			# Train using the generated batch
 			network.train(batch_states, batch_actions, batch_returns)
 
 		# Save the trained model
 		network.save("cart_pole_pixels/model")
+
+		print("'{}' has mean {}-episode return of {}".format(
+			best_model_path,
+			episode_window,
+			best_mean_return
+		))
 
 	# Final evaluation: Perform last 100 evaluation episodes
 	if args.evaluate:
