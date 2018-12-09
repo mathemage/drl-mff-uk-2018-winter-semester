@@ -138,8 +138,8 @@ if __name__ == "__main__":
 
 	# Parse arguments
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--checkpoint", default="./cart_pole_pixels/mean_100ep_return_497.17/model_best_100-episode_return", type=str,
-	                    help="Checkpoint path.")
+	parser.add_argument("--checkpoint", default="./cart_pole_pixels/mean_100ep_return_497.17/model_best_100-episode_return",
+	                    type=str, help="Checkpoint path.")
 	parser.add_argument("--batch_size", default=1, type=int, help="Number of episodes to train on.")
 	parser.add_argument("--episodes", default=8192, type=int, help="Training episodes.")
 	parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
