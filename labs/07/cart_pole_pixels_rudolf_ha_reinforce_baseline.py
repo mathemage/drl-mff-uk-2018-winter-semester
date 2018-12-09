@@ -164,8 +164,8 @@ if __name__ == "__main__":
 	if args.checkpoint:
 		# Try extract it from embedded_data
 		try:
-			import embedded_data
-			embedded_data.extract()
+			import embedded_data_cart_pole_pixels_rudolf_ha_reinforce_baseline
+			embedded_data_cart_pole_pixels_rudolf_ha_reinforce_baseline.extract()
 			# print("embedded_data extracted")
 		except:
 			pass
