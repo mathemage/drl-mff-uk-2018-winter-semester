@@ -104,7 +104,13 @@ class Network:
 			loss = loss_actor + loss_critic
 
 			global_step = tf.train.create_global_step()
-			self.training = tf.train.AdamOptimizer(args.learning_rate).minimize(loss, global_step=global_step, name="training")
+			if args.learning_rate_final:
+				decay_rate = (args.learning_rate_final / args.learning_rate)**(1.0 / (args.episodes - 1))
+				learning_rate = tf.train.exponential_decay(learning_rate=args.learning_rate, decay_rate=decay_rate,
+				                                global_step=global_step, decay_steps=1, staircase=False)
+			else:
+				learning_rate = args.learning_rate
+			self.training = tf.train.AdamOptimizer(learning_rate).minimize(loss, global_step=global_step, name="training")
 
 			# Initialize variables
 			self.session.run(tf.global_variables_initializer())
@@ -138,7 +144,8 @@ if __name__ == "__main__":
 	parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
 	parser.add_argument("--cnn", default="C-16-5-3-valid,C-24-5-3-valid", type=str,
 	                    help="Description of the CNN architecture.")
-	parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
+	parser.add_argument("--learning_rate", default=0.01, type=float, help="Learning rate.")
+	parser.add_argument("--learning_rate_final", default=0.0005, type=float, help="Final learning rate.")
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
 
