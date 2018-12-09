@@ -214,7 +214,7 @@ if __name__ == "__main__":
 				batch_returns.extend(returns)
 
 			# early stop: save the best model so far
-			if env.episode >= episode_window:
+			if env.episode >= episode_window and env.episode % 10 == 0:
 				mean_return = np.mean(env._episode_returns[- episode_window:])
 				if mean_return > best_mean_return:
 					print("mean {}-episode return: {} > {} \t -> storing to '{}'".format(
