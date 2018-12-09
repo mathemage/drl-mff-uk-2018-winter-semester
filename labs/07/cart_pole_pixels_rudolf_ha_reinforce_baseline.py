@@ -145,7 +145,7 @@ if __name__ == "__main__":
 	parser.add_argument("--cnn", default="C-16-5-3-valid,C-24-5-3-valid", type=str,
 	                    help="Description of the CNN architecture.")
 	parser.add_argument("--learning_rate", default=0.01, type=float, help="Learning rate.")
-	parser.add_argument("--learning_rate_final", default=0.001, type=float, help="Final learning rate.")
+	parser.add_argument("--learning_rate_final", default=0.0005, type=float, help="Final learning rate.")
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
 
