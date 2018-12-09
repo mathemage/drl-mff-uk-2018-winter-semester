@@ -166,6 +166,7 @@ if __name__ == "__main__":
 		try:
 			import embedded_data
 			embedded_data.extract()
+			print("embedded_data extracted")
 		except:
 			pass
 		network.load(args.checkpoint)
