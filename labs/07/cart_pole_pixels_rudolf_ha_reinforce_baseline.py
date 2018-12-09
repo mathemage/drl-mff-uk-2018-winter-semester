@@ -225,6 +225,8 @@ if __name__ == "__main__":
 					)
 					best_mean_return = mean_return
 					network.save(best_model_path)
+				if mean_return < 0.8 * best_mean_return:    # if performance decreases
+					network.load(best_model_path)             # reset
 
 			# Train using the generated batch
 			network.train(batch_states, batch_actions, batch_returns)
