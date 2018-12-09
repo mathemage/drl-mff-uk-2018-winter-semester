@@ -133,7 +133,7 @@ if __name__ == "__main__":
 	# Parse arguments
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--checkpoint", default=None, type=str, help="Checkpoint path.")
-	parser.add_argument("--batch_size", default=32, type=int, help="Number of episodes to train on.")
+	parser.add_argument("--batch_size", default=1, type=int, help="Number of episodes to train on.")
 	parser.add_argument("--episodes", default=8192, type=int, help="Training episodes.")
 	parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
 	parser.add_argument("--cnn", default="C-4-3-1-same,C-8-5-1-same,C-16-7-1-same", type=str,
