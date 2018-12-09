@@ -150,7 +150,7 @@ if __name__ == "__main__":
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
 	parser.add_argument("--threads", default=8, type=int, help="Maximum number of threads to use.")
 
-	parser.add_argument("--evaluate", default=False, type=bool, help="Run evaluation phase.")
+	parser.add_argument("--evaluate", default=True, type=bool, help="Run evaluation phase.")
 	args = parser.parse_args()
 
 	# Create the environment
