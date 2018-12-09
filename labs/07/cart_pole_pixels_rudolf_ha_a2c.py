@@ -104,7 +104,13 @@ class Network:
 			loss = loss_actor + loss_critic
 
 			global_step = tf.train.create_global_step()
-			self.training = tf.train.AdamOptimizer(args.learning_rate).minimize(loss, global_step=global_step, name="training")
+			if args.learning_rate_final:
+				decay_rate = (args.learning_rate_final / args.learning_rate)**(1.0 / (args.episodes - 1))
+				learning_rate = tf.train.exponential_decay(learning_rate=args.learning_rate, decay_rate=decay_rate,
+				                                global_step=global_step, decay_steps=1, staircase=False)
+			else:
+				learning_rate = args.learning_rate
+			self.training = tf.train.AdamOptimizer(learning_rate).minimize(loss, global_step=global_step, name="training")
 
 			# Initialize variables
 			self.session.run(tf.global_variables_initializer())
@@ -138,11 +144,12 @@ if __name__ == "__main__":
 	parser.add_argument("--checkpoint", default=None, type=str, help="Checkpoint path.")
 	parser.add_argument("--episodes", default=8192, type=int, help="Training episodes.")
 	parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
-	parser.add_argument("--cnn", default="C-4-3-1-same,C-8-5-1-same,C-16-7-1-same", type=str,
+	parser.add_argument("--cnn", default="C-16-5-3-valid,C-24-5-3-valid", type=str,
 	                    help="Description of the CNN architecture.")
 	parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
+	parser.add_argument("--learning_rate_final", default=0.001, type=float, help="Final learning rate.")
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
-	parser.add_argument("--threads", default=1024, type=int, help="Maximum number of threads to use.")
+	parser.add_argument("--threads", default=8, type=int, help="Maximum number of threads to use.")
 
 	parser.add_argument("--evaluate", default=True, type=bool, help="Run evaluation phase.")
 	args = parser.parse_args()
@@ -164,6 +171,9 @@ if __name__ == "__main__":
 			pass
 		network.load(args.checkpoint)
 	else:
+		best_mean_return = 0
+		episode_window = 100
+		best_model_path = "cart_pole_pixels/model_best_{}-episode_return".format(episode_window)
 		# Training
 		for _ in range(args.episodes):
 			# Perform episode
@@ -181,15 +191,34 @@ if __name__ == "__main__":
 					critic_next_state = network.critic([next_state])
 					delta += args.gamma * critic_next_state
 
-				# TODO early stop
+				# early stop: save the best model so far
+				if env.episode >= episode_window:
+					mean_return = np.mean(env._episode_returns[- episode_window:])
+					if mean_return > best_mean_return:
+						print("mean {}-episode return: {} > {} \t -> storing to '{}'".format(
+							episode_window,
+							mean_return,
+							best_mean_return,
+							best_model_path)
+						)
+						best_mean_return = mean_return
+						network.save(best_model_path)
+
 				network.train([state], [action], [delta])
 				state = next_state
 
 		# Save the trained model
 		network.save("cart_pole_pixels/model")
 
+		print("'{}' has mean {}-episode return of {}".format(
+			best_model_path,
+			episode_window,
+			best_mean_return
+		))
+
 	# Final evaluation: Perform last 100 evaluation episodes
 	if args.evaluate:
+		print("100 evaluation episodes:")
 		for _ in range(100):
 			state, done = env.reset(start_evaluate=True), False
 
