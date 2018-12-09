@@ -142,14 +142,14 @@ if __name__ == "__main__":
 	# Parse arguments
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--checkpoint", default=None, type=str, help="Checkpoint path.")
-	parser.add_argument("--episodes", default=8192, type=int, help="Training episodes.")
+	parser.add_argument("--episodes", default=512, type=int, help="Training episodes.")
 	parser.add_argument("--gamma", default=1.0, type=float, help="Discounting factor.")
 	parser.add_argument("--cnn", default="C-16-5-3-valid,C-24-5-3-valid", type=str,
 	                    help="Description of the CNN architecture.")
 	parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
 	parser.add_argument("--learning_rate_final", default=0.001, type=float, help="Final learning rate.")
-	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
-	parser.add_argument("--threads", default=8, type=int, help="Maximum number of threads to use.")
+	parser.add_argument("--render_each", default=128, type=int, help="Render some episodes.")
+	parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
 
 	parser.add_argument("--evaluate", default=True, type=bool, help="Run evaluation phase.")
 	args = parser.parse_args()
@@ -186,10 +186,10 @@ if __name__ == "__main__":
 				action = np.random.choice(env.actions, p=action_probabilities)
 				next_state, reward, done, _ = env.step(action)
 
-				delta = reward
+				estimate_of_return = reward
 				if not done:
 					critic_next_state = network.critic([next_state])
-					delta += args.gamma * critic_next_state
+					estimate_of_return += args.gamma * critic_next_state
 
 				# early stop: save the best model so far
 				if env.episode >= episode_window:
@@ -204,7 +204,7 @@ if __name__ == "__main__":
 						best_mean_return = mean_return
 						network.save(best_model_path)
 
-				network.train([state], [action], [delta])
+				network.train([state], [action], [estimate_of_return])
 				state = next_state
 
 		# Save the trained model
