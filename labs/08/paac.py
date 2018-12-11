@@ -117,10 +117,11 @@ if __name__ == "__main__":
 			# - extracting next_states from steps
 			next_states, rewards, dones, _ = map(list, zip(*list_of_tuples))
 
-			# TODO: Compute return estimates by
+			# Compute return estimates by
 			# - computing value function approximation in next_states
 			next_state_values = network.predict_values(next_states)
 			# - estimating returns by reward + (0 if done else args.gamma * next_state_value)
+			estimated_returns = rewards + np.multiply(args.gamma * next_state_values, 0, where=dones)
 
 			# TODO: Train network using current states, chosen actions and estimated returns
 
