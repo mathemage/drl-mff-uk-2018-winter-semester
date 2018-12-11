@@ -108,7 +108,9 @@ if __name__ == "__main__":
 	while True:
 		# Training
 		for _ in range(args.evaluate_each):
-			# TODO: Choose actions using network.predict_actions
+			# Choose actions using network.predict_actions
+			action_probabilities = network.predict_actions(states)[0]
+			actions = np.random.choice(env.actions, size=args.workers, p=action_probabilities)
 
 			# TODO: Perform steps by env.parallel_steps
 
