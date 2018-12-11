@@ -123,7 +123,8 @@ if __name__ == "__main__":
 			# - estimating returns by reward + (0 if done else args.gamma * next_state_value)
 			estimated_returns = rewards + np.multiply(args.gamma * next_state_values, 0, where=dones)
 
-			# TODO: Train network using current states, chosen actions and estimated returns
+			# Train network using current states, chosen actions and estimated returns
+			network.train(states, actions, estimated_returns)
 
 			states = next_states
 
