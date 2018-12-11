@@ -38,7 +38,7 @@ class Network:
 			# - compute `self.probabilities` as tf.nn.softmax of `logits`
 			self.probabilities = tf.nn.softmax(logits)
 
-			# TODO(reinforce_with_baseline): Compute `self.values`, starting with self.states and
+			# Compute `self.values`, starting with self.states and
 			# - add a fully connected layer of size args.hidden_layer and ReLU activation
 			hidden_critic = tf.layers.dense(self.states, args.hidden_layer, activation=tf.nn.relu)
 			# - add a fully connected layer with 1 output and no activation
