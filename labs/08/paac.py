@@ -57,7 +57,6 @@ class Network:
 			# - negative value of the distribution entropy (use `entropy` method of
 			#   `tf.distributions.Categorical`) weighted by `args.entropy_regularization`.
 			loss_entropy = - args.entropy_regularization * tf.distributions.Categorical(logits=logits).entropy()
-			# loss_entropy = - args.entropy_regularization entr * tf..entropy()self.probabilities
 			# - mean square error of the `self.returns` and `self.values`
 			loss_critic = tf.losses.mean_squared_error(self.returns, self.values)
 			loss = loss_actor + loss_critic + loss_entropy
@@ -138,3 +137,18 @@ if __name__ == "__main__":
 				probabilities = network.predict_actions([state])[0]
 				action = np.argmax(probabilities)
 				state, reward, done, _ = env.step(action)
+
+		if np.mean(env._episode_returns[-100:]) > 450:
+			break
+
+	print("100 evaluation episodes:")
+	for _ in range(100):
+		state, done = env.reset(start_evaluate=True), False
+
+		while not done:
+			# Compute action `probabilities` using `network.predict` and current `state`
+			action_probabilities = network.predict_actions([state])[0]
+
+			# Choose greedy action this time
+			action = np.argmax(action_probabilities)
+			state, reward, done, _ = env.step(action)
