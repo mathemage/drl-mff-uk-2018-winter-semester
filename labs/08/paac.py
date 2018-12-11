@@ -114,11 +114,12 @@ if __name__ == "__main__":
 
 			# Perform steps by env.parallel_steps
 			list_of_tuples = env.parallel_step(actions)
+			# - extracting next_states from steps
 			next_states, rewards, dones, _ = map(list, zip(*list_of_tuples))
 
 			# TODO: Compute return estimates by
-			# - extracting next_states from steps
-			# - computing value function approximatin in next_states
+			# - computing value function approximation in next_states
+			next_state_values = network.predict_values(next_states)
 			# - estimating returns by reward + (0 if done else args.gamma * next_state_value)
 
 			# TODO: Train network using current states, chosen actions and estimated returns
