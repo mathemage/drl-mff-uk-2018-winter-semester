@@ -46,7 +46,7 @@ class Network:
 			# - modify the result to have shape `[batch_size]` (you can use for example `[:, 0]`)
 			baseline = tf.squeeze(expanded_baseline)
 
-			# TODO: Compute `loss` as a sum of three losses:
+			# Compute `loss` as a sum of three losses:
 			# - sparse softmax cross entropy of `self.actions` and `logits`,
 			#   weighted by `self.returns - tf.stop_gradient(self.values)`.
 			loss_actor = tf.losses.sparse_softmax_cross_entropy(
@@ -56,7 +56,8 @@ class Network:
 			)
 			# - negative value of the distribution entropy (use `entropy` method of
 			#   `tf.distributions.Categorical`) weighted by `args.entropy_regularization`.
-			loss_entropy = None
+			loss_entropy = - args.entropy_regularization * tf.distributions.Categorical(logits=logits).entropy()
+			# loss_entropy = - args.entropy_regularization entr * tf..entropy()self.probabilities
 			# - mean square error of the `self.returns` and `self.values`
 			loss_critic = tf.losses.mean_squared_error(self.returns, baseline)
 			loss = loss_actor + loss_critic + loss_entropy
