@@ -108,8 +108,11 @@ if __name__ == "__main__":
 		# Training
 		for _ in range(args.evaluate_each):
 			# Choose actions using network.predict_actions
-			action_probabilities = network.predict_actions(states)[0]
-			actions = np.random.choice(env.actions, size=args.workers, p=action_probabilities)
+			action_probabilities = network.predict_actions(states)
+			actions = [
+				np.random.choice(env.actions, p=action_probability)
+				for action_probability in action_probabilities
+			]
 
 			# Perform steps by env.parallel_steps
 			list_of_tuples = env.parallel_step(actions)
