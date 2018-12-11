@@ -42,9 +42,9 @@ class Network:
 			# - add a fully connected layer of size args.hidden_layer and ReLU activation
 			hidden_critic = tf.layers.dense(self.states, args.hidden_layer, activation=tf.nn.relu)
 			# - add a fully connected layer with 1 output and no activation
-			expanded_baseline = tf.layers.dense(hidden_critic, 1)
+			expanded_baseline_values = tf.layers.dense(hidden_critic, 1)
 			# - modify the result to have shape `[batch_size]` (you can use for example `[:, 0]`)
-			baseline = tf.squeeze(expanded_baseline)
+			self.values = tf.squeeze(expanded_baseline_values)
 
 			# Compute `loss` as a sum of three losses:
 			# - sparse softmax cross entropy of `self.actions` and `logits`,
@@ -52,14 +52,14 @@ class Network:
 			loss_actor = tf.losses.sparse_softmax_cross_entropy(
 				labels=self.actions,
 				logits=logits,
-				weights=self.returns - tf.stop_gradient(baseline)
+				weights=self.returns - tf.stop_gradient(self.values)
 			)
 			# - negative value of the distribution entropy (use `entropy` method of
 			#   `tf.distributions.Categorical`) weighted by `args.entropy_regularization`.
 			loss_entropy = - args.entropy_regularization * tf.distributions.Categorical(logits=logits).entropy()
 			# loss_entropy = - args.entropy_regularization entr * tf..entropy()self.probabilities
 			# - mean square error of the `self.returns` and `self.values`
-			loss_critic = tf.losses.mean_squared_error(self.returns, baseline)
+			loss_critic = tf.losses.mean_squared_error(self.returns, self.values)
 			loss = loss_actor + loss_critic + loss_entropy
 
 			global_step = tf.train.create_global_step()
