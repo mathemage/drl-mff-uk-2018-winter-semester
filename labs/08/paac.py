@@ -112,7 +112,9 @@ if __name__ == "__main__":
 			action_probabilities = network.predict_actions(states)[0]
 			actions = np.random.choice(env.actions, size=args.workers, p=action_probabilities)
 
-			# TODO: Perform steps by env.parallel_steps
+			# Perform steps by env.parallel_steps
+			list_of_tuples = env.parallel_step(actions)
+			next_states, rewards, dones, _ = map(list, zip(*list_of_tuples))
 
 			# TODO: Compute return estimates by
 			# - extracting next_states from steps
