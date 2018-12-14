@@ -1,4 +1,16 @@
 #!/usr/bin/env python3
+#
+# All team solutions **must** list **all** members of the team.
+# The members must be listed using their ReCodEx ids anywhere
+# in the first comment block in the source file, i.e., in the first
+# consecutive range of lines beginning with `#`.
+#
+# You can find out ReCodEx id on URL when watching ReCodEx profile.
+# The id has the following format: 01234567-89ab-cdef-0123-456789abcdef.
+#
+# 090fa5b6-d3cf-11e8-a4be-00505601122b (Jan Rudolf)
+# 08a323e8-21f3-11e8-9de3-00505601122b (Karel Ha)
+#
 import numpy as np
 import tensorflow as tf
 
@@ -106,15 +118,25 @@ if __name__ == "__main__":
 			# TODO: Choose actions using network.predict_actions.
 			# using np.random.normal to sample action and np.clip
 			# to clip it using action_lows and action_highs,
+			action_probabilities = network.predict_actions(states)
+			actions = [
+				np.random.choice(env.actions, p=action_probability)
+				for action_probability in action_probabilities
+			]
 
-			# TODO: Perform steps by env.parallel_steps
-
-			# TODO: Compute return estimates by
+			# Perform steps by env.parallel_steps
+			list_of_tuples = env.parallel_step(actions)
 			# - extracting next_states from steps
-			# - computing value function approximatin in next_states
-			# - estimating returns by reward + (0 if done else args.gamma * next_state_value)
+			next_states, rewards, dones, _ = map(np.array, zip(*list_of_tuples))
 
-			# TODO: Train network using current states, chosen actions and estimated returns
+			# Compute return estimates by
+			# - computing value function approximation in next_states
+			next_state_values = (1 - dones) *  network.predict_values(next_states)
+			# - estimating returns by reward + (0 if done else args.gamma * next_state_value)
+			estimated_returns = rewards + args.gamma * next_state_values
+
+			# Train network using current states, chosen actions and estimated returns
+			network.train(states, actions, estimated_returns)
 
 			states = next_states
 
