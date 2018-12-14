@@ -115,13 +115,17 @@ if __name__ == "__main__":
 	while True:
 		# Training
 		for _ in range(args.evaluate_each):
-			# TODO: Choose actions using network.predict_actions.
+			# Choose actions using network.predict_actions.
 			# using np.random.normal to sample action and np.clip
 			# to clip it using action_lows and action_highs,
 			action_probabilities = network.predict_actions(states)
 			actions = [
-				np.random.choice(env.actions, p=action_probability)
-				for action_probability in action_probabilities
+        np.clip(
+	        np.random.normal(mu, sd),
+	        lo,
+	        hi
+        )
+				for ((mu, sd), lo, hi) in zip(action_probabilities, action_lows, action_highs)
 			]
 
 			# Perform steps by env.parallel_steps
