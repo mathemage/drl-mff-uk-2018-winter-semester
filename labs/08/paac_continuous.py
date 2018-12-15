@@ -60,8 +60,9 @@ class Network:
 			#   and `tf.nn.softplus` action.
 			self.sds = tf.layers.dense(hidden_sds, actions, activation=tf.nn.softplus)
 
-			# TODO: Create `action_distribution` using tf.distributions.Normal
+			# Create `action_distribution` using tf.distributions.Normal
 			# and computed `self.mus` and `self.sds`.
+			action_distribution = tf.distributions.Normal(loc=self.mus, scale=self.sds)
 
 			# TODO(reinforce_with_baseline): Compute `self.values`, starting with self.states and
 			# - add a fully connected layer of size args.hidden_layer and ReLU activation
