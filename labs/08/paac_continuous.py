@@ -30,10 +30,17 @@ class Network:
 			self.actions = tf.placeholder(tf.float32, [None, actions])
 			self.returns = tf.placeholder(tf.float32, [None])
 
-			# TODO: Because `self.states` are vectors of tile indices, convert them
+			# Because `self.states` are vectors of tile indices, convert them
 			# to one-hot encoding and store them as `states`. I.e., for batch
 			# example i, state should be a vector of length `weights` with `tiles` ones
 			# on indices `self.states[i, 0..`tiles`-1] and the rest being zeros.
+			states = tf.reduce_max(
+				tf.one_hot(
+					indices=self.states,
+					depth=weights,
+				),
+				axis=-2
+			)
 
 			# Expert remark: The `states` representation is very sparse, so much better
 			# performance can be achieved by converting it to `SparseTensor`. However,
@@ -66,6 +73,7 @@ class Network:
 			# - negative value of the distribution entropy (use `entropy` method of
 			#   the `action_distribution`) weighted by `args.entropy_regularization`.
 			# - mean square error of the `self.returns` and `self.values`
+			loss = None
 
 			global_step = tf.train.create_global_step()
 			self.training = tf.train.AdamOptimizer(args.learning_rate).minimize(loss, global_step=global_step, name="training")
@@ -96,9 +104,9 @@ if __name__ == "__main__":
 	parser.add_argument("--hidden_layer", default=100, type=int, help="Size of hidden layer.")
 	parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate.")
 	parser.add_argument("--render_each", default=0, type=int, help="Render some episodes.")
-	parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
 	parser.add_argument("--tiles", default=8, type=int, help="Tiles to use.")
-	parser.add_argument("--workers", default=1, type=int, help="Number of parallel workers.")
+	parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
+	parser.add_argument("--workers", default=4, type=int, help="Number of parallel workers.")
 	args = parser.parse_args()
 
 	# Create the environment
@@ -106,12 +114,12 @@ if __name__ == "__main__":
 	assert len(env.action_shape) == 1
 	action_lows, action_highs = env.action_ranges
 
+	# Initialize parallel workers by env.parallel_init
+	states = env.parallel_init(args.workers)
+
 	# Construct the network
 	network = Network(threads=args.threads)
 	network.construct(args, args.tiles, env.weights, env.action_shape[0])
-
-	# Initialize parallel workers by env.parallel_init
-	states = env.parallel_init(args.workers)
 	while True:
 		# Training
 		for _ in range(args.evaluate_each):
