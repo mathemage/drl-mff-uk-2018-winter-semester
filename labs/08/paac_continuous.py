@@ -153,3 +153,14 @@ if __name__ == "__main__":
 
 				action, _ = network.predict_actions([state])[0]
 				state, reward, done, _ = env.step(action)
+
+		if np.mean(env._episode_returns[-100:]) > 90:
+			break
+
+	print("100 evaluation episodes:")
+	for _ in range(100):
+		state, done = env.reset(start_evaluate=True), False
+
+		while not done:
+			action, _ = network.predict_actions([state])[0]
+			state, reward, done, _ = env.step(action)
