@@ -64,10 +64,13 @@ class Network:
 			# and computed `self.mus` and `self.sds`.
 			action_distribution = tf.distributions.Normal(loc=self.mus, scale=self.sds)
 
-			# TODO(reinforce_with_baseline): Compute `self.values`, starting with self.states and
+			# Compute `self.values`, starting with self.states and
 			# - add a fully connected layer of size args.hidden_layer and ReLU activation
+			hidden_values = tf.layers.dense(states, args.hidden_layer, activation=tf.nn.relu)
 			# - add a fully connected layer with 1 output and no activation
+			expanded_values = tf.layers.dense(hidden_values, 1, activation=None)
 			# - modify the result to have shape `[batch_size]` (you can use for example `[:, 0]`)
+			self.values = tf.squeeze(expanded_values)
 
 			# TODO: Compute `loss` as a sum of three losses:
 			# - negative log probability of the `self.actions` in the `action_distribution`
