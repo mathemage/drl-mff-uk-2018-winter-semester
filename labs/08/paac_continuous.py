@@ -72,16 +72,22 @@ class Network:
 			# - modify the result to have shape `[batch_size]` (you can use for example `[:, 0]`)
 			self.values = tf.squeeze(expanded_values)
 
-			# TODO: Compute `loss` as a sum of three losses:
+			# Compute `loss` as a sum of three losses:
 			# - negative log probability of the `self.actions` in the `action_distribution`
 			#   (using `log_prob` method). You need to sum the log probabilities
 			#   of subactions for a single batch example (using tf.reduce_sum with axis=1).
 			#   Then weight the resulting vector by (self.returns - tf.stop_gradient(self.values))
 			#   and compute its mean.
+			loss_actor = tf.reduce_sum(
+				- action_distribution.log_prob(self.actions),
+				axis=1
+			) * (self.returns - tf.stop_gradient(self.values))    # TODO tf.reduce_mean
 			# - negative value of the distribution entropy (use `entropy` method of
 			#   the `action_distribution`) weighted by `args.entropy_regularization`.
+			loss_entropy = - args.entropy_regularization * action_distribution.entropy()
 			# - mean square error of the `self.returns` and `self.values`
-			loss = None
+			loss_critic = tf.losses.mean_squared_error(self.returns, self.values)
+			loss = loss_actor + loss_critic + loss_entropy
 
 			global_step = tf.train.create_global_step()
 			self.training = tf.train.AdamOptimizer(args.learning_rate).minimize(loss, global_step=global_step, name="training")
