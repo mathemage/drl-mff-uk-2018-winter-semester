@@ -47,14 +47,18 @@ class Network:
 			# the `tf.layers.dense` cannot process `SparseTensor` inputs, so you would have
 			# to implement it manually using `tf.sparse_tensor_dense_matmul`.
 
-			# TODO: Compute `self.mus` and `self.sds`, each of shape [batch_size, actions].
+			# Compute `self.mus` and `self.sds`, each of shape [batch_size, actions].
 			# Compute each independently using `states` as input, adding a fully connected
 			# layer with args.hidden_layer units and ReLU activation. Then:
+			hidden_mus = tf.layers.dense(states, args.hidden_layer, activation=tf.nn.relu)
+			hidden_sds = tf.layers.dense(states, args.hidden_layer, activation=tf.nn.relu)
 			# - For `self.mus` add a fully connected layer with `actions` outputs.
 			#   To avoid `self.mus` moving from the required [-1,1] range, you can apply
 			#   `tf.tanh` activation.
+			self.mus = tf.layers.dense(hidden_mus, actions, activation=tf.nn.tanh)
 			# - For `self.sds` add a fully connected layer with `actions` outputs
 			#   and `tf.nn.softplus` action.
+			self.sds = tf.layers.dense(hidden_sds, actions, activation=tf.nn.softplus)
 
 			# TODO: Create `action_distribution` using tf.distributions.Normal
 			# and computed `self.mus` and `self.sds`.
