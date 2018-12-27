@@ -166,4 +166,15 @@ if __name__ == "__main__":
 		returns = []
 		for _ in range(args.evaluate_for):
 			returns.append(evaluate_episode())
-		print("Evaluation of {} episodes: {}".format(args.evaluate_for, np.mean(returns)))
+		mean_return = np.mean(returns)
+		print("Evaluation of {} episodes: {}".format(args.evaluate_for, mean_return))
+
+		if np.mean(mean_return) > -200:
+			break
+
+	print("Final 100 evaluation episodes:")
+	returns = []
+	for _ in range(100):
+		returns.append(evaluate_episode(evaluating=True))
+	mean_return = np.mean(returns)
+	print("Evaluation of final {} episodes: {}".format(100, mean_return))
