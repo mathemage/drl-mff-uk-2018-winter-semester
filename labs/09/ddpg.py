@@ -74,12 +74,16 @@ class Network:
 			# Define actor_loss and critic loss and then:
 			# - train the critic (if required, using critic variables only,
 			#     by using `var_list` argument of `Optimizer.minimize`)
+			critic_train = tf.train.AdamOptimizer(args.learning_rate).minimize(
+				critic_loss,
+				global_step=global_step,
+				var_list=tf.global_variables("critic")
+			)
 			# - train the actor (if required, using actor variables only,
 			#     by using `var_list` argument of `Optimizer.minimize`)
 			# - update target network variables
 			# You can group several operations into one using `tf.group`.
 
-			global_step = tf.train.create_global_step()
 			self.training = tf.group(...)
 
 			# Initialize variables
