@@ -154,7 +154,11 @@ if __name__ == "__main__":
 			state, done = env.reset(), False
 			noise.reset()
 			while not done:
-				# TODO: Perform an action and store the transition in the replay buffer
+				# Perform an action and store the transition in the replay buffer
+				action = network.predict_actions([state])[0] + noise.sample()
+				next_state, reward, done, _ = env.step(action)
+				replay_buffer.append(Transition(state, action, reward, done, next_state))
+				state = next_state
 
 				# If the replay_buffer is large enough, perform training
 				if len(replay_buffer) >= args.batch_size:
