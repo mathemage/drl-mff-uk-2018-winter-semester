@@ -71,7 +71,13 @@ class Network:
 				update_target_ops.append(target_var.assign((1.-args.target_tau) * target_var + args.target_tau * var))
 
 			# TODO: Training
-			# Define actor_loss and critic loss and then:
+			# Define actor_loss and critic_loss and then:
+			actor_loss = tf.reduce_sum(
+				- action_distribution.log_prob(self.actions),
+			) * (self.returns - tf.stop_gradient(self.values))
+
+			critic_loss = tf.losses.mean_squared_error(self.returns, self.values)
+			global_step = tf.train.create_global_step()
 			# - train the critic (if required, using critic variables only,
 			#     by using `var_list` argument of `Optimizer.minimize`)
 			critic_train = tf.train.AdamOptimizer(args.learning_rate).minimize(
@@ -81,6 +87,11 @@ class Network:
 			)
 			# - train the actor (if required, using actor variables only,
 			#     by using `var_list` argument of `Optimizer.minimize`)
+			actor_train = tf.train.AdamOptimizer(args.learning_rate).minimize(
+				actor_loss,
+				global_step=global_step,
+				var_list=tf.global_variables("actor")
+			)
 			# - update target network variables
 			# You can group several operations into one using `tf.group`.
 
