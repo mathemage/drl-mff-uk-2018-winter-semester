@@ -164,7 +164,10 @@ if __name__ == "__main__":
 				if len(replay_buffer) >= args.batch_size:
 					batch = np.random.choice(len(replay_buffer), size=args.batch_size, replace=False)
 					states, actions, rewards, dones, next_states = zip(*[replay_buffer[i] for i in batch])
-					# TODO: Perform the training
+					# Perform the training
+				  # y's below are from https://ufal.mff.cuni.cz/~straka/courses/npfl122/1819/slides/?09#20
+					ys = rewards + args.gamma * network.predict_values(states)
+					network.train(states, actions, ys)
 
 		# Evaluation
 		returns = []
