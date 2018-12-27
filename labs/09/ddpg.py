@@ -94,8 +94,7 @@ class Network:
 			)
 			# - update target network variables
 			# You can group several operations into one using `tf.group`.
-
-			self.training = tf.group(...)
+			self.training = tf.group([critic_train, actor_train] + update_target_ops)
 
 			# Initialize variables
 			self.session.run(tf.global_variables_initializer())
