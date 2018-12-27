@@ -44,10 +44,16 @@ class Network:
 
 			# Critic from given actions
 			def critic(inputs, actions):
-			# TODO: Implement critic network, starting with `inputs` and `actions`
-			# and producing a vector of predicted returns. Usually, `inputs` are fed
-			# through a hidden layer first, and then concatenated with `actions` and fed
-			# through two more hidden layers, before computing the returns.
+				# Implement critic network, starting with `inputs` and `actions`
+				# and producing a vector of predicted returns. Usually, `inputs` are fed
+				# through a hidden layer first, and then concatenated with `actions` and fed
+				# through two more hidden layers, before computing the returns.
+				latest_layer = tf.layers.dense(inputs, args.hidden_layer, activation=tf.nn.relu)
+				latest_layer = tf.concat(latest_layer, actions)
+				for _ in range(2):
+					latest_layer = tf.layers.dense(latest_layer, args.hidden_layer, activation=tf.nn.relu)
+				outputs = tf.layers.dense(latest_layer, 1, activation=None)
+				return outputs
 
 			with tf.variable_scope("critic"):
 				values_of_given = critic(self.states, self.actions)
