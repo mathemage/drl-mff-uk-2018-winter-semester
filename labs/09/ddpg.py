@@ -22,13 +22,19 @@ class Network:
 
 			# Actor
 			def actor(inputs):
-			# TODO: Implement actor network, starting with `inputs` and returning
-			# action_components values for each batch example. Usually, one
-			# or two hidden layers are employed.
-			#
-			# Each action_component[i] should be mapped to range
-			# [actions_lows[i]..action_highs[i]], for example using tf.nn.sigmoid
-			# and suitable rescaling.
+				# Implement actor network, starting with `inputs` and returning
+				# action_components values for each batch example. Usually, one
+				# or two hidden layers are employed.
+				#
+				# Each action_component[i] should be mapped to range
+				# [actions_lows[i]..action_highs[i]], for example using tf.nn.sigmoid
+				# and suitable rescaling.
+				latest_layer = inputs
+				for _ in range(2):
+					latest_layer = tf.layers.dense(latest_layer, args.hidden_layer, activation=tf.nn.relu)
+				outputs = tf.layers.dense(latest_layer, action_components, activation=tf.nn.sigmoid)
+				rescaled_outputs = action_lows + (action_highs - action_lows) * outputs
+				return rescaled_outputs
 
 			with tf.variable_scope("actor"):
 				self.mus = actor(self.states)
